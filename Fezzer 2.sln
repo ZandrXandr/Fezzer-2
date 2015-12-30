@@ -1,0 +1,33 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2008
+
+Project("{4A38A0F6-3C1C-8BA6-7E4A-EB2C927908B5}") = "Fezzer 2", "Assembly-CSharp-firstpass.csproj", "{47524BE2-0468-1225-678E-44E50799F85B}"
+EndProject
+Project("{4A38A0F6-3C1C-8BA6-7E4A-EB2C927908B5}") = "Fezzer 2", "Assembly-CSharp.csproj", "{6931D4F9-82B2-94E0-6643-4228D6502DC1}"
+EndProject
+Project("{4A38A0F6-3C1C-8BA6-7E4A-EB2C927908B5}") = "Fezzer 2", "Assembly-CSharp-Editor.csproj", "{99752E8A-4430-B8F2-91F0-0E284AE058E0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{47524BE2-0468-1225-678E-44E50799F85B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47524BE2-0468-1225-678E-44E50799F85B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47524BE2-0468-1225-678E-44E50799F85B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47524BE2-0468-1225-678E-44E50799F85B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6931D4F9-82B2-94E0-6643-4228D6502DC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6931D4F9-82B2-94E0-6643-4228D6502DC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6931D4F9-82B2-94E0-6643-4228D6502DC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6931D4F9-82B2-94E0-6643-4228D6502DC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99752E8A-4430-B8F2-91F0-0E284AE058E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99752E8A-4430-B8F2-91F0-0E284AE058E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99752E8A-4430-B8F2-91F0-0E284AE058E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99752E8A-4430-B8F2-91F0-0E284AE058E0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	
+EndGlobal

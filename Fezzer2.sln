@@ -1,0 +1,33 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2008
+
+Project("{48A24F3C-3803-6F11-C0EE-4D4A50A34290}") = "Fezzer2", "Assembly-CSharp-firstpass.csproj", "{1A9454C8-F001-DF82-9F03-5AA92B9E29A8}"
+EndProject
+Project("{48A24F3C-3803-6F11-C0EE-4D4A50A34290}") = "Fezzer2", "Assembly-CSharp.csproj", "{6065F5D5-D6EB-F68B-A006-45F634563D62}"
+EndProject
+Project("{48A24F3C-3803-6F11-C0EE-4D4A50A34290}") = "Fezzer2", "Assembly-CSharp-Editor.csproj", "{4A075312-F7E0-8BDB-7D94-0115DC1E687E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1A9454C8-F001-DF82-9F03-5AA92B9E29A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A9454C8-F001-DF82-9F03-5AA92B9E29A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A9454C8-F001-DF82-9F03-5AA92B9E29A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A9454C8-F001-DF82-9F03-5AA92B9E29A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6065F5D5-D6EB-F68B-A006-45F634563D62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6065F5D5-D6EB-F68B-A006-45F634563D62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6065F5D5-D6EB-F68B-A006-45F634563D62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6065F5D5-D6EB-F68B-A006-45F634563D62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A075312-F7E0-8BDB-7D94-0115DC1E687E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A075312-F7E0-8BDB-7D94-0115DC1E687E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A075312-F7E0-8BDB-7D94-0115DC1E687E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A075312-F7E0-8BDB-7D94-0115DC1E687E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	
+EndGlobal
