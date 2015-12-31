@@ -49,12 +49,13 @@ public class CameraMovement : MonoBehaviour {
         } else {
             //sessao.enabled=true;
             c.orthographic=false;
-            yRot-=Input.GetAxis("Mouse Y")*(3+(speed/2));
-            yRot=Mathf.Clamp(yRot, -90, 90);
             transform.localPosition=Vector3.zero;
 
             if (!Input.GetKey(KeyCode.LeftShift))
                 return;
+
+            yRot-=Input.GetAxis("Mouse Y")*(3+(speed/2));
+            yRot=Mathf.Clamp(yRot, -90, 90);
 
             speed+=Input.mouseScrollDelta.y*2;
             speed=Mathf.Clamp(speed, 0.25f, 30);
