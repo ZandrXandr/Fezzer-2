@@ -303,61 +303,57 @@ public class LevelManager : Singleton<LevelManager> {
     }
 
     [SerializeField]
-    RectTransform uiContent;
+    RectTransform horizontal;
     [SerializeField]
     GameObject buttonPrefab;
 
+    int columnCount = 4;
+
     void ListTrilesUnderUI() {
 
-        int uiSizeX = 45;
-        int uiSizey = 50;
+        RectTransform rowRectTransform = buttonPrefab.GetComponent<RectTransform>();
+        RectTransform containerRectTransform = horizontal.GetComponent<RectTransform>();
+        int itemCount = s.Triles.Count;
 
-        int x = 0, y = 0;
+        //calculate the width and height of each child item.
+        float width = containerRectTransform.rect.width/columnCount;
+        float ratio = width/rowRectTransform.rect.width;
+        float height = rowRectTransform.rect.height*ratio;
 
-        int ySize = s.Triles.Count/4;
+        height/=2;
+        width/=2;
 
-        Debug.Log(s.TextureAtlas.GetPixel(0, 0));
+        int rowCount = itemCount/columnCount;
+        if (itemCount%rowCount>0)
+            rowCount++;
 
-        foreach (KeyValuePair<int, Trile> t in s.Triles) {
+        //adjust the height of the container so that it will just barely fit all its children
+        float scrollHeight = height*rowCount;
+        containerRectTransform.offsetMin=new Vector2(containerRectTransform.offsetMin.x, -scrollHeight/2);
+        containerRectTransform.offsetMax=new Vector2(containerRectTransform.offsetMax.x, scrollHeight/2);
 
-            GameObject newTileButton = Instantiate(buttonPrefab);
+        int j = 0;
+        for (int i = 0; i<itemCount; i++) {
+            //this is used instead of a double for loop because itemCount may not fit perfectly into the rows/columns
+            if (i%columnCount==0)
+                j++;
 
-            newTileButton.transform.SetParent(uiContent,false);
-            newTileButton.transform.localPosition=new Vector3(((float)x+0.5f)*uiSizeX,(y-(ySize/2)-2)*uiSizey,5);
+            //create a new item, name it, and set the parent
+            GameObject newItem = Instantiate(buttonPrefab);
+            newItem.name=gameObject.name+" item at ("+i+","+j+")";
+            newItem.transform.parent=horizontal;
 
-            newTileButton.name=t.Key.ToString();
+            //move and size the new item
+            RectTransform rectTransform = newItem.GetComponent<RectTransform>();
 
-            Texture2D tex = new Texture2D(18,18);
+            float x = -containerRectTransform.rect.width/2+width*(i%columnCount);
+            float y = containerRectTransform.rect.height/2-height*j;
+            rectTransform.offsetMin=new Vector2(x, y);
 
-            int trileSize = 18;
-
-            int tX = Mathf.CeilToInt(t.Value.AtlasOffset.x*s.TextureAtlas.width);
-            int tY = Mathf.CeilToInt(t.Value.AtlasOffset.y*s.TextureAtlas.width);
-
-            for (int px = 0; px < trileSize; px++) {
-                for (int py = 0; py<trileSize; py++) {
-
-                    Color get = s.TextureAtlas.GetPixel(px+(tY),(18-py)+(tX));
-                    get.a=1;
-
-                    tex.SetPixel(px,py, get);
-                }
-            }
-
-            tex.filterMode=FilterMode.Point;
-            tex.Apply();
-
-            newTileButton.GetComponent<UnityEngine.UI.RawImage>().texture=tex;
-            newTileButton.GetComponentInChildren<UnityEngine.UI.Text>().text=t.Key.ToString();
-
-            x++;
-
-            if (x>=4) {
-                y++;
-                x=0;
-            }
+            x=rectTransform.offsetMin.x+width;
+            y=rectTransform.offsetMin.y+height;
+            rectTransform.offsetMax=new Vector2(x, y);
         }
 
-        uiContent.sizeDelta=new Vector2(0,ySize*(uiSizey));
     }
 }

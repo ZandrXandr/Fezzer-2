@@ -41,7 +41,7 @@ public class CameraEditor : MonoBehaviour {
 
                 Debug.DrawLine(rh.point, transform.position, Color.green, 15f);
 
-                TrileEmplacement place = new TrileEmplacement((int)(rh.transform.position.x+rh.normal.x), (int)(rh.transform.position.y+rh.normal.y), (int)(rh.transform.position.z+rh.normal.z));
+                TrileEmplacement place = new TrileEmplacement(Mathf.CeilToInt(rh.transform.position.x+rh.normal.x), Mathf.CeilToInt(rh.transform.position.y+rh.normal.y), Mathf.CeilToInt(rh.transform.position.z+rh.normal.z));
                 LevelManager.Instance.AddTrile(place);
 
             }
