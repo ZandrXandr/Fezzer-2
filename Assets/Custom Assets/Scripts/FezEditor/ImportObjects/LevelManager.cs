@@ -9,7 +9,7 @@ public class LevelManager : Singleton<LevelManager> {
 
     Level loaded;
 
-    public string levelName,resourcePath;
+    public string levelName, resourcePath;
     string setName;
 
     [SerializeField]
