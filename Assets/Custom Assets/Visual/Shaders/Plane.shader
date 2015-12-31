@@ -23,6 +23,8 @@
 		fixed4 c = tex2D(_MainTex, IN.uv_MainTex) * _Color;
 		o.Albedo = c.rgb;
 		o.Alpha = c.a;
+		if (length(c.rgb) <= 0.1)
+			o.Alpha = 0;
 	}
 	ENDCG
 	}

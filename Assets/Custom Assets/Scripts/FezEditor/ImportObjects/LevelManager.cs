@@ -17,6 +17,9 @@ public class LevelManager : Singleton<LevelManager> {
 
     public GameObject trilePrefab, aoPrefab, planePrefab;
 
+    Dictionary<TrileEmplacement, GameObject> trileObjects = new Dictionary<TrileEmplacement, GameObject>();
+
+    //Caching
     List<GameObject> tileCache = new List<GameObject>();
     List<GameObject> aoObjectCache = new List<GameObject>();
 
@@ -30,6 +33,12 @@ public class LevelManager : Singleton<LevelManager> {
     void Awake() {
         OutputPath.setPath=resourcePath+"out/";
 
+    }
+
+    int currTrileID;
+
+    public void PickTrile(GameObject toPick) {
+        currTrileID=int.Parse(toPick.name);
     }
 
     public void LoadLevel() {
@@ -50,6 +59,7 @@ public class LevelManager : Singleton<LevelManager> {
         LoadAOMeshes();
 
         StartCoroutine(LoadLevelCoroutine());
+        ListTrilesUnderUI();
     }
 
     public void LoadSetMeshes() {
@@ -83,6 +93,9 @@ public class LevelManager : Singleton<LevelManager> {
     Material setMat;
 
     IEnumerator LoadLevelCoroutine() {
+
+        System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+        sw.Start();
 
         yield return new WaitForEndOfFrame();
 
@@ -147,9 +160,13 @@ public class LevelManager : Singleton<LevelManager> {
 
                 MeshFilter mf = newTrile.GetComponent<MeshFilter>();
                 MeshRenderer mr = newTrile.GetComponent<MeshRenderer>();
+                BoxCollider bc = newTrile.GetComponent<BoxCollider>();
 
                 mr.material=setMat;
                 mf.mesh=trilesetCache[s.Triles[kvp.Value.TrileId]];
+
+                bc.size=mf.mesh.bounds.size;
+                bc.center=mf.mesh.bounds.center;
 
                 newTrile.transform.position=new Vector3(kvp.Key.X,kvp.Key.Y,kvp.Key.Z);
                 newTrile.transform.rotation=Quaternion.Euler(0,Mathf.Rad2Deg*kvp.Value.Data.PositionPhi.w,0);
@@ -158,11 +175,12 @@ public class LevelManager : Singleton<LevelManager> {
 
                 if (index>50) {
                     index=0;
-                    yield return new WaitForEndOfFrame();
+                    //yield return new WaitForEndOfFrame();
                 }
 
                 newTrile.name=s.Triles[kvp.Value.TrileId].Name;
-                newTrile.transform.position+=s.Triles[kvp.Value.TrileId].Offset;
+                newTrile.transform.parent=transform.FindChild("Triles");
+                trileObjects.Add(kvp.Key,newTrile);
             }
 
             //Generate Planes
@@ -193,11 +211,22 @@ public class LevelManager : Singleton<LevelManager> {
                             Debug.Log("Tex Null!");
                     } catch(System.Exception e) {
                         Debug.Log(e);
+                        Debug.Log(b.TextureName.ToLower());
+                        Destroy(newPlane);
+                        continue;
                     }
 
                     newPlane.name=b.TextureName;
 
+                    index++;
+
+                    if (index>5) {
+                        index=0;
+                        //yield return new WaitForEndOfFrame();
+                    }
+
                     newPlane.transform.rotation=Quaternion.Euler(newPlane.transform.eulerAngles.x,newPlane.transform.eulerAngles.y-180,newPlane.transform.eulerAngles.z);
+                    newPlane.transform.parent=transform.FindChild("ArtObjects");
                 }
 
             }
@@ -222,12 +251,113 @@ public class LevelManager : Singleton<LevelManager> {
 
                     if (index>5) {
                         index=0;
-                        yield return new WaitForEndOfFrame();
+                        //yield return new WaitForEndOfFrame();
                     }
                     newTrile.name=kvp.Value.ArtObjectName;
+                    newTrile.transform.parent=transform.FindChild("ArtObjects");
+                }
+            }
+        }
+
+        sw.Stop();
+        Debug.Log(sw.ElapsedMilliseconds);
+    }
+
+    public void RemoveTrile(TrileEmplacement trilePos) {
+        if (!loaded.Triles.ContainsKey(trilePos))
+            return;
+        loaded.Triles.Remove(trilePos);
+        
+        Destroy(trileObjects[trilePos]);
+        trileObjects.Remove(trilePos);
+    }
+
+    public void AddTrile(TrileEmplacement trilePos) {
+        if (loaded.Triles.ContainsKey(trilePos))
+            return;
+
+        TrileInstance newInstance = new TrileInstance();
+        newInstance.TrileId=currTrileID;
+        newInstance.Position=new Vector3(trilePos.X,trilePos.Y,trilePos.Z);
+
+        loaded.Triles.Add(trilePos,newInstance);
+
+        GameObject newTrile = Instantiate(trilePrefab);
+
+        MeshFilter mf = newTrile.GetComponent<MeshFilter>();
+        MeshRenderer mr = newTrile.GetComponent<MeshRenderer>();
+        BoxCollider bc = newTrile.GetComponent<BoxCollider>();
+
+        mr.material=setMat;
+        mf.mesh=trilesetCache[s.Triles[newInstance.TrileId]];
+
+        bc.size=mf.mesh.bounds.size;
+        bc.center=mf.mesh.bounds.center;
+
+        newTrile.transform.position=new Vector3(trilePos.X, trilePos.Y, trilePos.Z);
+        newTrile.transform.rotation=Quaternion.Euler(0, 0, 0);
+
+        newTrile.name=s.Triles[newInstance.TrileId].Name;
+        newTrile.transform.parent=transform.FindChild("Triles");
+        trileObjects.Add(trilePos, newTrile);
+    }
+
+    [SerializeField]
+    RectTransform uiContent;
+    [SerializeField]
+    GameObject buttonPrefab;
+
+    void ListTrilesUnderUI() {
+
+        int uiSizeX = 45;
+        int uiSizey = 50;
+
+        int x = 0, y = 0;
+
+        int ySize = s.Triles.Count/4;
+
+        Debug.Log(s.TextureAtlas.GetPixel(0, 0));
+
+        foreach (KeyValuePair<int, Trile> t in s.Triles) {
+
+            GameObject newTileButton = Instantiate(buttonPrefab);
+
+            newTileButton.transform.SetParent(uiContent,false);
+            newTileButton.transform.localPosition=new Vector3(((float)x+0.5f)*uiSizeX,(y-(ySize/2)-2)*uiSizey,5);
+
+            newTileButton.name=t.Key.ToString();
+
+            Texture2D tex = new Texture2D(18,18);
+
+            int trileSize = 18;
+
+            int tX = Mathf.CeilToInt(t.Value.AtlasOffset.x*s.TextureAtlas.width);
+            int tY = Mathf.CeilToInt(t.Value.AtlasOffset.y*s.TextureAtlas.width);
+
+            for (int px = 0; px < trileSize; px++) {
+                for (int py = 0; py<trileSize; py++) {
+
+                    Color get = s.TextureAtlas.GetPixel(px+(tY),(18-py)+(tX));
+                    get.a=1;
+
+                    tex.SetPixel(px,py, get);
                 }
             }
 
+            tex.filterMode=FilterMode.Point;
+            tex.Apply();
+
+            newTileButton.GetComponent<UnityEngine.UI.RawImage>().texture=tex;
+            newTileButton.GetComponentInChildren<UnityEngine.UI.Text>().text=t.Key.ToString();
+
+            x++;
+
+            if (x>=4) {
+                y++;
+                x=0;
+            }
         }
+
+        uiContent.sizeDelta=new Vector2(0,ySize*(uiSizey));
     }
 }
