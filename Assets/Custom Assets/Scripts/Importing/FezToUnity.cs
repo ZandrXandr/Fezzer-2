@@ -65,13 +65,13 @@ class FezToUnity {
         m.Optimize();
 
         return m;
-
     }
 
     public static Material GeometryToMaterial(Texture2D cubeMap) {
         Material m =  new Material(Shader.Find("Diffuse"));
 
         m.mainTexture=cubeMap;
+        m.mainTexture.filterMode=FilterMode.Point;
 
         return m;
     }

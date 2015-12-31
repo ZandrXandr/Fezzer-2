@@ -16,7 +16,7 @@ public class CameraMovement : MonoBehaviour {
         //sessao=GetComponent<SESSAO>();
 	}
 
-    public bool isOrthographic;
+    public bool isOrthographic { get; set; }
     public int rotation;
 	
 	// Update is called once per frame
@@ -27,7 +27,7 @@ public class CameraMovement : MonoBehaviour {
             speed-=Input.mouseScrollDelta.y/2;
             speed=Mathf.Clamp(speed, 0.1f, 30);
 
-            transform.localPosition=Vector3.back*(speed+2);
+            transform.localPosition=Vector3.back*30*(speed+2);
             transform.localRotation=Quaternion.identity;
             transform.parent.rotation=Quaternion.Lerp(transform.parent.rotation,Quaternion.Euler(0,90*rotation,0),5*Time.deltaTime);
 

@@ -11,6 +11,9 @@ public class CameraEditor : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+
+        if (Input.GetKeyDown(KeyCode.L))
+            LevelManager.Instance.LoadLevel();
+
 	}
 }

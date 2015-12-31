@@ -34,7 +34,6 @@ public class AssetManager {
             return;
 
         string filePathXNB = OutputPath.OutputPathDir+"trile sets/"+toLoad+".xnb";
-        string texturePath = OutputPath.OutputPathDirExport+"trile sets/"+toLoad+".png";
 
         if(!File.Exists(filePathXNB) ) {
             Debug.LogError("No model!");
@@ -103,7 +102,6 @@ public class AssetManager {
             return;
 
         string filePathXNB = OutputPath.OutputPathDir+"art objects/"+toLoad+".xnb";
-        string texturePath = OutputPath.OutputPathDirExport+"art objects/"+toLoad+".png";
 
         if (!File.Exists(filePathXNB)) {
             Debug.LogError("No model!");
