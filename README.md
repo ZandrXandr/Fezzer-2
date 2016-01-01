@@ -23,7 +23,7 @@ Then simply edit the Resource Path parameter on the LevelImported script to wher
 
 7:Hit the L key on your keyboard, and wait for the level to load in.
 
-6:Right click to place new triles, left click to remove, click a trile on the left panel to select it.
+6:Hold left shift and use mouse+wasd to change the camera. Right click to place new triles, left click to remove, click a trile on the left panel to select it.
 
 
 ----------NOTES-------------
