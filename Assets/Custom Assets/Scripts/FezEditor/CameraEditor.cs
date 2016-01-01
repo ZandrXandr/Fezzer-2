@@ -19,6 +19,10 @@ public class CameraEditor : MonoBehaviour {
         if (Input.GetKey(KeyCode.LeftShift))
             return;
 
+        if (Input.GetKeyDown(KeyCode.S)) {
+            LevelManager.Instance.SaveLevel();
+        }
+
         if (Input.GetMouseButtonDown(0)) {
             RaycastHit rh;
 
@@ -40,8 +44,9 @@ public class CameraEditor : MonoBehaviour {
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out rh)) {
 
                 Debug.DrawLine(rh.point, transform.position, Color.green, 15f);
+                Debug.DrawLine(rh.point,rh.point+rh.normal,Color.blue,15f);
 
-                TrileEmplacement place = new TrileEmplacement(Mathf.CeilToInt(rh.transform.position.x+rh.normal.x), Mathf.CeilToInt(rh.transform.position.y+rh.normal.y), Mathf.CeilToInt(rh.transform.position.z+rh.normal.z));
+                TrileEmplacement place = new TrileEmplacement(Mathf.RoundToInt(rh.transform.position.x+rh.normal.x), Mathf.RoundToInt(rh.transform.position.y+rh.normal.y), Mathf.RoundToInt(rh.transform.position.z+rh.normal.z));
                 LevelManager.Instance.AddTrile(place);
 
             }
