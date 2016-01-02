@@ -13,17 +13,15 @@ Then simply edit the Resource Path parameter on the LevelImported script to wher
 
 2:Open the project in at least Unity 5
 
-3:Open the scene "Test" under "Custom Assets>Scenes"
+3:Build the game using File>Build Settings>Build for your OS
 
-4:Select the "Level" object on the hierarchy, and change "Resource Path" to the FezParse folder (Example:C:/Users/[user]/Documents/FezParse/"
+4:Run the game when the window opens in the folder for it
 
-5:Change the "Level Name" to whatever the name of the level is, in all lowercase, without any extension (Example, bell_tower. level names can be found in your "[fezparse]/out/levels" folder) 
+5:Type the path to xnb parse in the Resource Path field (Example:"C:/Users/[your user]/Documents/xnb_parse/"
 
-6:Hit the play button on the top of your screen
+6:Type the level you want to load into Level Name field (bell_tower,arch,ect. You can find the names in xnb_parse/out/levels)
 
-7:Hit the L key on your keyboard, and wait for the level to load in.
-
-6:Hold left shift and use mouse+wasd to change the camera. Right click to place new triles, left click to remove, click a trile on the left panel to select it.
+7:Hold right click to move the camera, hold alt to edit the terrain.
 
 
 ----------NOTES-------------
