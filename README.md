@@ -21,7 +21,7 @@ Then simply edit the Resource Path parameter on the LevelImported script to wher
 
 6:Type the level you want to load into Level Name field (bell_tower,arch,ect. You can find the names in xnb_parse/out/levels)
 
-7:Hold right click to move the camera, hold alt to edit the terrain.
+7:Hold right click to move the camera, hold ctrl to edit the terrain.
 
 
 ----------NOTES-------------
