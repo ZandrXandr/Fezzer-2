@@ -111,7 +111,7 @@ public class LevelManager : Singleton<LevelManager> {
       
 
         sw.Stop();
-        Debug.Log("LevelLoad:+"+sw.ElapsedMilliseconds.ToString());
+        Debug.Log("Level loaded in about "+sw.ElapsedMilliseconds.ToString() + " ms");
 
         currTrileID=s.Triles.Keys.First();
 
@@ -338,7 +338,7 @@ public class LevelManager : Singleton<LevelManager> {
         }
 
         sw.Stop();
-        Debug.Log(sw.ElapsedMilliseconds);
+        Debug.Log("Objects created in " + sw.ElapsedMilliseconds + " ms");
     }
 
     GameObject NewTrileObject(TrileEmplacement atPos) {

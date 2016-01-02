@@ -24,6 +24,9 @@ public class CameraEditor : MonoBehaviour {
             Application.CaptureScreenshot(Application.dataPath+"Screenshot.png",3);
         }
 
+        if (Input.GetKeyDown(KeyCode.U))
+            myMode=(EditMode)(((int)myMode+1)%2);
+
         if (Input.GetKey(KeyCode.LeftShift))
             return;
 

@@ -92,7 +92,7 @@ public class SkyColorManager : Singleton<SkyColorManager> {
                     texture2D=FmbUtil.ReadObject<Texture2D>(assetName2);
                 }
                 catch (Exception ex) {
-                    Debug.Log("Sky Init" + "|" +  "Cloud tinting texture could not be found");
+                    //Debug.Log("Sky Init" + "|" +  "Cloud tinting texture could not be found");
                 }
             }
             if (texture2D!=null) {
@@ -113,10 +113,10 @@ public class SkyColorManager : Singleton<SkyColorManager> {
                 if (skyLayer.Name=="OBS_SKY_A")
                     texture2D2=FmbUtil.ReadObject<Texture2D>(str1+"OBS_SKY_C");
                 int num2 = 0;
-                Debug.Log("Add Sky Objects?");
+                //Debug.Log("Add Sky Objects?");
                 ++num1;
             }
-            Debug.Log("Add Clouds");
+            //Debug.Log("Add Clouds");
 
             float num3 = 64f*sky.Density;
             int num4 = (int)Math.Sqrt((double)num3);
@@ -124,7 +124,7 @@ public class SkyColorManager : Singleton<SkyColorManager> {
             float num6 = UnityEngine.Random.Range(0.0f, 6.28318548202515f);
             float num7 = UnityEngine.Random.Range(0.0f, 192.0f);
 
-            Debug.Log("Cloud Meshes");
+            //Debug.Log("Cloud Meshes");
 
             flickerIn=UnityEngine.Random.Range(2.0f, 10.0f);
         }
