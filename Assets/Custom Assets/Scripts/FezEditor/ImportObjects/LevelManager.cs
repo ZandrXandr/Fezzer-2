@@ -373,9 +373,6 @@ public class LevelManager : Singleton<LevelManager> {
         mr.material=setMat;
         mf.mesh=trilesetCache[s.Triles[instance.TrileId]];
 
-        bc.size=mf.mesh.bounds.size;
-        bc.center=mf.mesh.bounds.center;
-
         newTrile.transform.position=new Vector3(atPos.X, atPos.Y, atPos.Z);
         newTrile.transform.rotation=Quaternion.Euler(0, Mathf.Rad2Deg*instance.Data.PositionPhi.w, 0);
 
@@ -541,5 +538,9 @@ public class LevelManager : Singleton<LevelManager> {
 
     public void SaveLevel() {
 
+    }
+
+    public Vector3 getAOBounds(int id) {
+        return aoMeshCache[aoCache[id]].bounds.size;
     }
 }
