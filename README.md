@@ -25,12 +25,17 @@ Then simply edit the Resource Path parameter on the LevelImported script to wher
 
 
 ----------NOTES-------------
-Currently FZ2 doesn't work as a build! Still in development!
+
+
 
 
 ----------TODO--------------
 Preloading trilesets and art objects so they aren't loaded on the fly every time you need new ones
+
 Level Editor (Need writing in FmbLib)
+
 Comment a bunch so people know what stuff is
+
 Optimize, obviously
+
 Trile Editor (Need writing in FmbLib)
