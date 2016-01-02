@@ -50,6 +50,7 @@
      <Compile Include="Assets\Custom Assets\Scripts\FezEditor\ImportObjects\ArtObjectImported.cs" />
      <Compile Include="Assets\Custom Assets\Scripts\FezEditor\ImportObjects\LevelManager.cs" />
      <Compile Include="Assets\Custom Assets\Scripts\FezEditor\ImportObjects\TrileImported.cs" />
+     <Compile Include="Assets\Custom Assets\Scripts\FezEditor\SkyColorManager.cs" />
      <Compile Include="Assets\Custom Assets\Scripts\FezEditor\TrileButton.cs" />
      <Compile Include="Assets\Custom Assets\Scripts\FezEditor\UI\PropertiesEditor.cs" />
      <Compile Include="Assets\Custom Assets\Scripts\Generic\Bezier.cs" />
@@ -143,11 +144,17 @@
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BlurAndFlares.shader" />
      <None Include="Assets\Custom Assets\Visual\Shaders\Plane.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BlendForBloom.shader" />
+ <Reference Include="UnityEngine.Advertisements">
+ <HintPath>F:/Unity/Editor/Data/UnityExtensions/Unity/Advertisements/UnityEngine.Advertisements.dll</HintPath>
+ </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>F:/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Networking">
  <HintPath>F:/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEngine.Analytics">
+ <HintPath>F:/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>
  <Reference Include="FmbLib-Unity">
  <HintPath>F:/Git/Fezzer2/Assets/Plugins/FmbLib-Unity.dll</HintPath>

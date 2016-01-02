@@ -80,6 +80,17 @@ public class LevelManager : Singleton<LevelManager> {
             planeObjectCache.Add(t.gameObject);
         }
 
+        List<GameObject> toDestroy = new List<GameObject>();
+
+        for(int i = 0; i < toParent.childCount; i++) {
+            toDestroy.Add(toParent.GetChild(i).gameObject);
+        }
+
+        while (toDestroy.Count>0) {
+            Destroy(toDestroy[0]);
+            toDestroy.RemoveAt(0);
+        }
+
         visibility.Clear();
         trilesetCache.Clear();
     }
@@ -112,6 +123,7 @@ public class LevelManager : Singleton<LevelManager> {
 
         StartCoroutine(LoadLevelCoroutine());
         ListTrilesUnderUI();
+        SkyColorManager.Instance.Load();
     }
 
     public void LoadSetMeshes() {
@@ -254,7 +266,7 @@ public class LevelManager : Singleton<LevelManager> {
                         Texture2D tex = FmbUtil.ReadObject<Texture2D>(OutputPath.OutputPathDir+"background planes/"+b.TextureName.ToLower()+".xnb");
 
                         if (tex!=null) {
-                            tex.alphaIsTransparency=true;
+                            //tex.alphaIsTransparency=true;
                             mr.material.mainTexture=tex;
                             mr.material.mainTexture.filterMode=FilterMode.Point;
                         } else
