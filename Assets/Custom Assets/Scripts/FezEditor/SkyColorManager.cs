@@ -7,9 +7,6 @@ using System;
 
 public class SkyColorManager : Singleton<SkyColorManager> {
 
-    float _Time;
-
-
     private static readonly float[] starSideOffsets = new float[4];
     private const int Clouds = 64;
     private const int BaseDistance = 32;
@@ -20,6 +17,7 @@ public class SkyColorManager : Singleton<SkyColorManager> {
     private readonly Mesh stars;
     private Texture2D skyBackground;
     public Mesh BgLayers;
+    [SerializeField]
     private Color[] fogColors;
     private Color[] cloudColors;
     private float flickerIn;
@@ -100,7 +98,7 @@ public class SkyColorManager : Singleton<SkyColorManager> {
             if (texture2D!=null) {
                 this.cloudColors=new Color[texture2D.width];
                 Color[] data2 = new Color[texture2D.width*texture2D.height];
-                data2=texture2D.GetPixels();
+                data2=texture2D.GetPixels(0,0,texture2D.width,texture2D.height);
                 Array.Copy((Array)data2, texture2D.width*(texture2D.height/2), (Array)this.cloudColors, 0, texture2D.width);
             } else
                 this.cloudColors=new Color[1]
@@ -130,27 +128,50 @@ public class SkyColorManager : Singleton<SkyColorManager> {
 
             flickerIn=UnityEngine.Random.Range(2.0f, 10.0f);
         }
+        _TimeMax=fogColors.Length;
     }
 
 	// Update is called once per frame
 	void Update () {
 
-        if(fogColors!=null)
-            if(fogColors.Length>0)
-                skyboxMat.color=CurrentFogColor;
+        if (Input.GetKey(KeyCode.T))
+            _Time=_TimeMax/2;
+
+        _Time+=Time.deltaTime*(_TimeMax/daySeconds);
+
+        if (fogColors!=null) {
+            if (fogColors.Length>0) {
+                skyboxMat.SetColor("_SkyTint", CurrentFogColor);
+                skyboxMat.SetColor("_GroundColor", CurrentFogColor/2);
+            }
+        }
 
     }
+
+    [SerializeField]
+    float _Time,_TimeMax,daySeconds;
+
+    [SerializeField]
+    int _index;
 
     private Color CurrentFogColor {
         get {
-            float number = 15/(float)fogColors.Length;
-            if (number==(double)fogColors.Length)
-                number=0.0f;
-            return Color.Lerp(this.fogColors[Math.Max((int)Math.Floor((double)number), 0)], this.fogColors[Math.Min((int)Math.Ceiling((double)number), this.fogColors.Length-1)], Frac(number));
-        }
-    }
 
-    float Frac(float number) {
-        return number-(float)(int)number;
+            if (_Time<0)
+                _Time=_TimeMax;
+            _Time=_Time%_TimeMax;
+
+            float timeFrac = _Time/_TimeMax;
+            float timeBetween = (float)fogColors.Length/_TimeMax;
+
+            int index = Mathf.FloorToInt(timeFrac*fogColors.Length);
+            int nextIndex = index+1;
+            if (nextIndex>=fogColors.Length)
+                nextIndex=0;
+
+            _index=index;
+
+            return Color.Lerp(fogColors[index],fogColors[nextIndex],_Time%timeBetween);
+        }
     }
 }
