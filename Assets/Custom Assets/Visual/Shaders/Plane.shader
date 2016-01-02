@@ -7,7 +7,7 @@
 		SubShader{
 		Tags{ "Queue" = "Transparent" "IgnoreProjector" = "True" "RenderType" = "Transparent" }
 		LOD 200
-		Offset -0.1,-0.1
+		Offset -1,-15
 
 		CGPROGRAM
 #pragma surface surf Lambert alpha:fade

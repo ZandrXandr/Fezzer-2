@@ -24,10 +24,10 @@ public class CameraMovement : MonoBehaviour {
 
         if (isOrthographic) {
             //sessao.enabled=false;
-            speed-=Input.mouseScrollDelta.y/2;
+            speed-=Input.mouseScrollDelta.y*0.75f;
             speed=Mathf.Clamp(speed, 0.1f, 30);
 
-            transform.localPosition=Vector3.back*30*(speed+2);
+            transform.localPosition=Vector3.back*5*(speed+2);
             transform.localRotation=Quaternion.identity;
             transform.parent.rotation=Quaternion.Lerp(transform.parent.rotation,Quaternion.Euler(0,90*rotation,0),5*Time.deltaTime);
 
