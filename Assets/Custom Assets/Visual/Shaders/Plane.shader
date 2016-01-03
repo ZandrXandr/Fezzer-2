@@ -8,6 +8,7 @@
 		Tags{ "Queue" = "Transparent" "IgnoreProjector" = "True" "RenderType" = "Transparent" }
 		LOD 200
 		Offset -1,-15
+		Cull Off
 
 		CGPROGRAM
 #pragma surface surf Lambert alpha:fade

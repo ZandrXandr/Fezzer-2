@@ -6,6 +6,8 @@ using FezEngine.Structure;
 using System.Threading;
 using FmbLib;
 
+using System.IO;
+
 public class LevelManager : Singleton<LevelManager> {
 
     [HideInInspector]
@@ -48,9 +50,36 @@ public class LevelManager : Singleton<LevelManager> {
         currTrileID=int.Parse(toPick.name);
     }
 
+    public void PickTrile(int id) {
+        currTrileID=id;
+    }
+
     public void LoadLevel() {
         UnloadLevel();
         LoadLevel(levelName);
+    }
+
+    public int GetAOId(ArtObject input) {
+        foreach (KeyValuePair<int, ArtObject> kvp in aoCache)
+            if (kvp.Value==input)
+                return kvp.Key;
+        return 0;
+    }
+
+    public void ChangeAOKeyTo(int prev, int curr) {
+        if (!aoCache.ContainsKey(prev) && !aoCache.ContainsKey(curr))
+            return;
+        ArtObject reference =aoCache[prev];
+
+        aoCache.Remove(prev);
+        aoCache.Add(curr,reference);
+    }
+
+    public ArtObject GetAO(int id) {
+        return aoCache[id];
+    }
+    public Trile GetTrile(int id) {
+        return s.Triles[id];
     }
 
     void UnloadLevel() {
@@ -95,12 +124,18 @@ public class LevelManager : Singleton<LevelManager> {
         trilesetCache.Clear();
     }
 
+    [SerializeField]
+    bool isFMB;
+
     public void LoadLevel(string name) {
 
         System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
         sw.Start();
 
-        loaded=FmbUtil.ReadObject<Level>(OutputPath.OutputPathDir+"levels/"+name.ToLower()+".xnb");
+        if(isFMB)
+            loaded=FmbUtil.ReadObject<Level>("F:/Fezzer 2/FZ2 Export/"+levelName+".fmb");
+        else
+            loaded=FmbUtil.ReadObject<Level>(OutputPath.OutputPathDir+"levels/"+levelName+".xnb");
 
         //Load the trile set 
         if (s==null) {
@@ -409,6 +444,23 @@ public class LevelManager : Singleton<LevelManager> {
         }
     }
 
+    void UpdateCulling(TrileEmplacement around) {
+        TrileEmplacement[] checkPos = new TrileEmplacement[6];
+
+        checkPos[0]=new TrileEmplacement(around.X, around.Y, around.Z+1);
+        checkPos[1]=new TrileEmplacement(around.X, around.Y, around.Z-1);
+
+        checkPos[2]=new TrileEmplacement(around.X, around.Y+1, around.Z);
+        checkPos[3]=new TrileEmplacement(around.X, around.Y-1, around.Z);
+
+        checkPos[4]=new TrileEmplacement(around.X+1, around.Y, around.Z);
+        checkPos[5]=new TrileEmplacement(around.X-1, around.Y, around.Z);
+
+        foreach (TrileEmplacement t in checkPos) {
+            GenerateTrile(t);
+        }
+    }
+
     void GenerateTrile(TrileEmplacement atPos) {
 
         if (!loaded.Triles.ContainsKey(atPos)) {
@@ -426,13 +478,12 @@ public class LevelManager : Singleton<LevelManager> {
 
                 Destroy(toRemove);
             }
-            return;
-        }
-        if (trileObjects.ContainsKey(atPos))
-            return;
-
-        {
-            
+        } else {
+            if (trileObjects.ContainsKey(atPos))
+                return;
+            else {
+                GameObject g = NewTrileObject(atPos);
+            }
         }
     }
 
@@ -461,28 +512,13 @@ public class LevelManager : Singleton<LevelManager> {
         return false;
     }
 
-    public void AddTrile(TrileEmplacement trilePos) {
+    public void RegenTrile(TrileEmplacement trilePos) {
         if (loaded.Triles.ContainsKey(trilePos))
             return;
 
         GameObject genTrile = NewTrileObject(trilePos);
 
-        {
-            TrileEmplacement[] checkPos = new TrileEmplacement[6];
-
-            checkPos[0]=new TrileEmplacement(trilePos.X, trilePos.Y, trilePos.Z+1);
-            checkPos[1]=new TrileEmplacement(trilePos.X, trilePos.Y, trilePos.Z-1);
-
-            checkPos[2]=new TrileEmplacement(trilePos.X, trilePos.Y+1, trilePos.Z);
-            checkPos[3]=new TrileEmplacement(trilePos.X, trilePos.Y-1, trilePos.Z);
-
-            checkPos[4]=new TrileEmplacement(trilePos.X+1, trilePos.Y, trilePos.Z);
-            checkPos[5]=new TrileEmplacement(trilePos.X-1, trilePos.Y, trilePos.Z);
-
-            foreach (TrileEmplacement t in checkPos) {
-                GenerateTrile(t);
-            }
-        }
+        UpdateCulling(trilePos);
     }
 
     [SerializeField]
@@ -538,9 +574,49 @@ public class LevelManager : Singleton<LevelManager> {
 
     public void SaveLevel() {
 
+        Debug.Log("Saving");
+
+        string dirpath = OutputPath.OutputPathDir;
+        string file = levelName + ".fmb";
+
+        dirpath = Path.GetFullPath(Path.Combine(dirpath, @"..\"));
+        dirpath=dirpath+"FZ2 Export/";
+
+        if (!Directory.Exists(dirpath))
+            Directory.CreateDirectory(dirpath);
+
+        Debug.Log(dirpath);
+
+
+        if (File.Exists(dirpath+file)) {
+            File.Delete(dirpath+file);
+        }
+        FmbUtil.WriteObject<Level>(dirpath+file,loaded);
+
     }
 
-    public Vector3 getAOBounds(int id) {
-        return aoMeshCache[aoCache[id]].bounds.size;
+    public Bounds getAOBounds(int id) {
+        return aoMeshCache[aoCache[id]].bounds;
+    }
+    public Bounds getTrileBounds(int id) {
+        return trilesetCache[s.Triles[id]].bounds;
+    }
+
+    public void MoveTrile(TrileEmplacement from, TrileEmplacement to, TrileInstance move) {
+        Debug.Log("Removing " + new Vector3(from.X,from.Y,from.Z) + " from triles");
+        loaded.Triles.Remove(from);
+        loaded.Triles.Add(to,move);
+
+        //Update the culling of the triles around the position we came from and moved to.
+        UpdateCulling(from);
+        UpdateCulling(to);
+    }
+
+    public void MoveAO(int id, Vector3 moveTo) {
+        loaded.ArtObjects[id].Position=moveTo;
+    }
+
+    public bool isOccupied(TrileEmplacement pos) {
+        return loaded.Triles.ContainsKey(pos);
     }
 }

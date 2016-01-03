@@ -134,15 +134,12 @@ public class SkyColorManager : Singleton<SkyColorManager> {
 	// Update is called once per frame
 	void Update () {
 
-        if (Input.GetKey(KeyCode.T))
-            _Time=_TimeMax/2;
-
         _Time+=Time.deltaTime*(_TimeMax/daySeconds);
 
         if (fogColors!=null) {
             if (fogColors.Length>0) {
                 skyboxMat.SetColor("_SkyTint", CurrentFogColor);
-                skyboxMat.SetColor("_GroundColor", CurrentFogColor/2);
+                skyboxMat.SetColor("_GroundColor", CurrentFogColor);
             }
         }
 

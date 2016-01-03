@@ -12,6 +12,12 @@ public class CameraEditor : MonoBehaviour {
 
     public EditMode myMode;
 
+    public int setMode {
+        set {
+            myMode=(EditMode)value;
+        }
+    }
+
 	// Use this for initialization
 	void Start () {
         resourcePath.text=PlayerPrefs.GetString("path");
@@ -23,9 +29,6 @@ public class CameraEditor : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Y)) {
             Application.CaptureScreenshot(Application.dataPath+"Screenshot.png",3);
         }
-
-        if (Input.GetKeyDown(KeyCode.U))
-            myMode=(EditMode)(((int)myMode+1)%2);
 
         if (Input.GetKey(KeyCode.LeftShift))
             return;
@@ -48,7 +51,7 @@ public class CameraEditor : MonoBehaviour {
 
     void WorldEdtiorMode() {
 
-        if (!Input.GetKey(KeyCode.LeftControl))
+        if (!Input.GetKey(KeyCode.E))
             return;
 
         if (Input.GetKeyDown(KeyCode.S)) {
@@ -79,8 +82,17 @@ public class CameraEditor : MonoBehaviour {
                 Debug.DrawLine(rh.point, rh.point+rh.normal, Color.blue, 15f);
 
                 TrileEmplacement place = new TrileEmplacement(Mathf.RoundToInt(rh.transform.position.x+rh.normal.x), Mathf.RoundToInt(rh.transform.position.y+rh.normal.y), Mathf.RoundToInt(rh.transform.position.z+rh.normal.z));
-                LevelManager.Instance.AddTrile(place);
+                LevelManager.Instance.RegenTrile(place);
 
+            }
+        }
+
+        if (Input.GetMouseButtonDown(3)) {
+            RaycastHit rh;
+
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out rh)) {
+                if(rh.transform.tag=="Trile")
+                    LevelManager.Instance.PickTrile(rh.transform.GetComponent<TrileImported>().myInstance.TrileId);
             }
         }
     }
@@ -88,9 +100,13 @@ public class CameraEditor : MonoBehaviour {
     public TrileImported lastTrile;
     public ArtObjectImported lastAO;
 
+    TrileEmplacement preTrileMove;
+
     public bool isTrile;
 
     float dist = 1;
+
+    float distOffset = 0;
 
     Plane objectDragging;
 
@@ -102,12 +118,14 @@ public class CameraEditor : MonoBehaviour {
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out rh)) {
                 if (rh.transform.tag=="Trile") {
                     lastTrile=rh.transform.GetComponent<TrileImported>();
-                    drawSizeTrile=LevelManager.s.Triles[lastTrile.myInstance.TrileId].Size;
+                    trileBounds=LevelManager.Instance.getTrileBounds(lastTrile.myInstance.TrileId);
                     isTrile=true;
+                    ObjectProperties.Instance.SetToTrile(lastTrile.myInstance.TrileId);
                 } else if (rh.transform.tag=="ArtObject") {
                     lastAO=rh.transform.GetComponent<ArtObjectImported>();
-                    drawSizeAO=LevelManager.Instance.getAOBounds(lastAO.myInstance.Id);
+                    aoBounds=LevelManager.Instance.getAOBounds(lastAO.myInstance.Id);
                     isTrile=false;
+                    ObjectProperties.Instance.SetToAO(lastAO.myInstance.Id);
                 }
             }
         } else if (Input.GetMouseButtonDown(1)) {
@@ -121,6 +139,29 @@ public class CameraEditor : MonoBehaviour {
             RaycastHit rh;
 
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out rh)) {
+
+                if (rh.transform.tag=="Trile") {
+                    if (lastTrile==null) {
+                        isTrile=true;
+                        lastTrile=rh.transform.GetComponent<TrileImported>();
+                        trileBounds=LevelManager.Instance.getTrileBounds(lastTrile.myInstance.TrileId);
+
+                    } else if (rh.transform!=lastTrile.transform) {
+                        isTrile=true;
+                        lastTrile=rh.transform.GetComponent<TrileImported>();
+                        trileBounds=LevelManager.Instance.getTrileBounds(lastTrile.myInstance.TrileId);
+                    }
+                } else if (rh.transform.tag=="ArtObject") {
+                    if (lastAO==null) {
+                        isTrile=false;
+                        lastAO=rh.transform.GetComponent<ArtObjectImported>();
+                        aoBounds=LevelManager.Instance.getAOBounds(lastAO.myInstance.Id);
+                    } else if (rh.transform!=lastAO.transform) {
+                        isTrile=false;
+                        lastAO=rh.transform.GetComponent<ArtObjectImported>();
+                        aoBounds=LevelManager.Instance.getAOBounds(lastAO.myInstance.Id);
+                    }
+                }
                 objectDragging.SetNormalAndPosition(rh.normal,rh.point);
             }
 
@@ -128,18 +169,23 @@ public class CameraEditor : MonoBehaviour {
                 if (lastTrile==null)
                     return;
 
+                preTrileMove=new TrileEmplacement((int)lastTrile.transform.position.x,(int)lastTrile.transform.position.y,(int)lastTrile.transform.position.z);
                 lastTrile.GetComponent<BoxCollider>().enabled=false;
 
             } else {
                 if (lastAO==null)
                     return;
 
-                lastAO.GetComponent<BoxCollider>().enabled=true;
+                lastAO.GetComponent<MeshCollider>().enabled=false;
             }
 
         }
 
         if (Input.GetMouseButton(1)) {
+
+            distOffset-=Input.mouseScrollDelta.y/10;
+
+            distOffset=Mathf.Clamp(distOffset,-1,1);
 
             RaycastHit rh;
 
@@ -157,6 +203,8 @@ public class CameraEditor : MonoBehaviour {
 
                 if (objectDragging.Raycast(cam, out pos)) {
                     lastTrile.transform.position=cam.GetPoint(pos)+(objectDragging.normal/2);
+                    lastTrile.transform.position-=trileBounds.center;
+                    lastTrile.transform.position+=transform.forward*distOffset;
                 }
 
             } else {
@@ -169,6 +217,8 @@ public class CameraEditor : MonoBehaviour {
 
                 if (objectDragging.Raycast(cam, out pos)) {
                     lastAO.transform.position=cam.GetPoint(pos)-(objectDragging.normal/2);
+                    lastAO.transform.position-=aoBounds.center;
+                    lastAO.transform.position+=transform.forward*distOffset;
                 }
             }
         }
@@ -179,14 +229,24 @@ public class CameraEditor : MonoBehaviour {
                     return;
 
                 lastTrile.transform.position=roundToGrid(1,lastTrile.transform.position);
-                lastTrile.GetComponent<BoxCollider>().enabled=false;
+                TrileEmplacement newPlacment = new TrileEmplacement(Mathf.FloorToInt(lastTrile.transform.position.x), Mathf.RoundToInt(lastTrile.transform.position.y), Mathf.RoundToInt(lastTrile.transform.position.z));
+
+                if (LevelManager.Instance.isOccupied(newPlacment)) {
+                    Debug.Log("Trile exists at " + new Vector3(newPlacment.X,newPlacment.Y,newPlacment.Z) + " id is " + LevelManager.Instance.loaded.Triles[newPlacment].TrileId);
+                    lastTrile.transform.position=new Vector3(preTrileMove.X, preTrileMove.Y, preTrileMove.Z);
+                    lastTrile.GetComponent<BoxCollider>().enabled=true;
+                } else {
+                    LevelManager.Instance.MoveTrile(preTrileMove, newPlacment, lastTrile.myInstance);
+                    lastTrile.GetComponent<BoxCollider>().enabled=true;
+                }
 
             } else {
                 if (lastAO==null)
                     return;
 
-                lastAO.transform.position=roundToGrid(2,lastAO.transform.position);
-                lastAO.GetComponent<BoxCollider>().enabled=true;
+                lastAO.transform.position=roundToGrid(16,lastAO.transform.position);
+                LevelManager.Instance.MoveAO(lastAO.myInstance.Id,lastAO.transform.position);
+                lastAO.GetComponent<MeshCollider>().enabled=true;
             }
         }
 
@@ -225,8 +285,8 @@ public class CameraEditor : MonoBehaviour {
 
     }
 
-    Vector3 drawSizeAO,drawSizeTrile;
-    Vector3 aoCenter, trileCenter;
+    Bounds trileBounds, aoBounds;
+
     Vector3[] vertsToDraw = {
      new Vector3(0,0,0) , new Vector3(0,1,0)
     ,new Vector3(0,0,0) , new Vector3(1,0,0)
@@ -245,42 +305,42 @@ public class CameraEditor : MonoBehaviour {
     };
 
     [SerializeField]
-    Material lineMat;
+    Material lineMatTrile,lineMatAO;
 
     void OnPostRender() {
-        if (!lineMat) {
-            Debug.LogError("Please Assign a material on the inspector");
-            return;
-        }
         GL.PushMatrix();
-        lineMat.SetPass(0);
-        GL.Begin(GL.LINES);
+        lineMatTrile.SetPass(0);
 
         //Draw cube
         {
+            GL.Begin(GL.LINES);
             if (lastTrile!=null) {
-                GL.Color(Color.green);
                 for (int i = 0; i<vertsToDraw.Length; i++) {
                     Vector3 curr = vertsToDraw[i];
                     curr-=Vector3.one/2;
                     curr*=1.1f;
-                    curr=new Vector3(curr.x*drawSizeTrile.x,curr.y*drawSizeTrile.y,curr.z*drawSizeTrile.z);
+                    curr=new Vector3(curr.x*trileBounds.size.x,curr.y*trileBounds.size.y,curr.z*trileBounds.size.z);
 
+                    curr+=trileBounds.center;
                     curr=lastTrile.transform.rotation*curr;
                     curr+=lastTrile.transform.position;
 
                     GL.Vertex(curr);
                 }
             }
+            GL.End();
+            lineMatAO.SetPass(0);
+            GL.Begin(GL.LINES);
 
             if (lastAO!=null) {
-                GL.Color(Color.green);
+                GL.Color(Color.red);
                 for (int i = 0; i<vertsToDraw.Length; i++) {
                     Vector3 curr = vertsToDraw[i];
                     curr-=Vector3.one/2;
                     curr*=1.1f;
-                    curr=new Vector3(curr.x*drawSizeAO.x, curr.y*drawSizeAO.y, curr.z*drawSizeAO.z);
+                    curr=new Vector3(curr.x*aoBounds.size.x, curr.y*aoBounds.size.y, curr.z*aoBounds.size.z);
 
+                    curr+=aoBounds.center;
                     curr=lastAO.transform.rotation*curr;
                     curr+=lastAO.transform.position;
 
