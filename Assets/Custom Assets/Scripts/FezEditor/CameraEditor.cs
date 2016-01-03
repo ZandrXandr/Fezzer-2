@@ -51,9 +51,23 @@ public class CameraEditor : MonoBehaviour {
 
     void WorldEdtiorMode() {
 
-        if (!Input.GetKey(KeyCode.E))
+        if (!Input.GetKey(KeyCode.E)) {
+            if (PlacmentPreview.Instance.gameObject.activeSelf)
+                PlacmentPreview.Instance.gameObject.SetActive(false);
             return;
+        }
 
+        //Trile preview
+        {
+            RaycastHit rh;
+
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out rh)) {
+                if (!PlacmentPreview.Instance.gameObject.activeSelf)
+                    PlacmentPreview.Instance.gameObject.SetActive(true);
+                PlacmentPreview.Instance.transform.position=new Vector3(Mathf.RoundToInt(rh.transform.position.x+rh.normal.x), Mathf.RoundToInt(rh.transform.position.y+rh.normal.y), Mathf.RoundToInt(rh.transform.position.z+rh.normal.z));
+            } else if (PlacmentPreview.Instance.gameObject.activeSelf)
+                PlacmentPreview.Instance.gameObject.SetActive(false);
+        }
         if (Input.GetKeyDown(KeyCode.S)) {
             LevelManager.Instance.SaveLevel();
         }
@@ -81,7 +95,7 @@ public class CameraEditor : MonoBehaviour {
                 Debug.DrawLine(rh.point, transform.position, Color.green, 15f);
                 Debug.DrawLine(rh.point, rh.point+rh.normal, Color.blue, 15f);
 
-                TrileEmplacement place = new TrileEmplacement(Mathf.RoundToInt(rh.transform.position.x+rh.normal.x), Mathf.RoundToInt(rh.transform.position.y+rh.normal.y), Mathf.RoundToInt(rh.transform.position.z+rh.normal.z));
+                TrileEmplacement place = new TrileEmplacement(Mathf.RoundToInt(rh.point.x+rh.normal.x), Mathf.RoundToInt(rh.point.y+rh.normal.y), Mathf.RoundToInt(rh.point.z+rh.normal.z));
                 LevelManager.Instance.RegenTrile(place);
 
             }

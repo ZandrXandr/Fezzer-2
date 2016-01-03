@@ -48,10 +48,16 @@ public class LevelManager : Singleton<LevelManager> {
 
     public void PickTrile(GameObject toPick) {
         currTrileID=int.Parse(toPick.name);
+        ObjectProperties.Instance.SetToTrile(currTrileID);
+        PlacmentPreview.Instance.mf.mesh=trilesetCache[s.Triles[currTrileID]];
+        RotatingTrile.Instance.mf.mesh=trilesetCache[s.Triles[currTrileID]];
     }
 
     public void PickTrile(int id) {
         currTrileID=id;
+        ObjectProperties.Instance.SetToTrile(currTrileID);
+        PlacmentPreview.Instance.mf.mesh=trilesetCache[s.Triles[currTrileID]];
+        RotatingTrile.Instance.mf.mesh=trilesetCache[s.Triles[currTrileID]];
     }
 
     public void LoadLevel() {
@@ -162,9 +168,13 @@ public class LevelManager : Singleton<LevelManager> {
     }
 
     public void LoadSetMeshes() {
-        setMat=new Material(Shader.Find("Standard"));
+        setMat=new Material(Shader.Find("Diffuse"));
         s.TextureAtlas.filterMode=FilterMode.Point;
         setMat.mainTexture=s.TextureAtlas;
+
+        RotatingTrile.Instance.mr.material=setMat;
+        PlacmentPreview.Instance.mr.material.mainTexture=setMat.mainTexture;
+
         foreach(Trile t in s.Triles.Values) {
             trilesetCache.Add(t,FezToUnity.TrileToMesh(t));
         }
