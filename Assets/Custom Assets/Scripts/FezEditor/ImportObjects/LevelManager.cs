@@ -52,7 +52,7 @@ public class LevelManager : Singleton<LevelManager> {
         PlacmentPreview.Instance.mf.mesh=trilesetCache[s.Triles[currTrileID]];
         PlacmentPreview.Instance.mr.material.mainTexture=s.TextureAtlas;
         RotatingTrile.Instance.mf.mesh=trilesetCache[s.Triles[currTrileID]];
-        CameraEditor.placeMagnitude=getTrileBounds(currTrileID).size.magnitude;
+        CameraEditor.placeMagnitude=getTrileBounds(currTrileID).size.magnitude*0.45f;
         CameraEditor.isTrile=true;
     }
 
@@ -62,7 +62,7 @@ public class LevelManager : Singleton<LevelManager> {
         PlacmentPreview.Instance.mf.mesh=trilesetCache[s.Triles[currTrileID]];
         PlacmentPreview.Instance.mr.material.mainTexture=s.TextureAtlas;
         RotatingTrile.Instance.mf.mesh=trilesetCache[s.Triles[currTrileID]];
-        CameraEditor.placeMagnitude=getTrileBounds(currTrileID).size.magnitude;
+        CameraEditor.placeMagnitude=getTrileBounds(currTrileID).size.magnitude*0.45f;
         CameraEditor.isTrile=true;
     }
 
@@ -70,18 +70,18 @@ public class LevelManager : Singleton<LevelManager> {
         ObjectProperties.Instance.SetToAO(toPick.name);
         PlacmentPreview.Instance.mf.mesh=aoMeshCache[aoCache[toPick.name]];
         PlacmentPreview.Instance.mr.material.mainTexture=aoCache[toPick.name].Cubemap;
-        CameraEditor.placeMagnitude=getAOBounds(toPick.name).size.magnitude;
+        CameraEditor.placeMagnitude=getAOBounds(toPick.name).size.magnitude*0.45f;
         CameraEditor.isTrile=false;
-
+        CameraEditor.aoName=toPick.name;
     }
 
     public void PickAO(string id) {
         ObjectProperties.Instance.SetToAO(id);
         PlacmentPreview.Instance.mf.mesh=aoMeshCache[aoCache[id]];
         PlacmentPreview.Instance.mr.material.mainTexture=aoCache[id].Cubemap;
-        CameraEditor.placeMagnitude=getAOBounds(id).size.magnitude;
+        CameraEditor.placeMagnitude=getAOBounds(id).size.magnitude*0.45f;
         CameraEditor.isTrile=false;
-
+        CameraEditor.aoName=id;
     }
 
     public void LoadLevel() {
@@ -547,6 +547,47 @@ public class LevelManager : Singleton<LevelManager> {
         GameObject genTrile = NewTrileObject(trilePos);
 
         UpdateCulling(trilePos);
+    }
+
+    public void GenerateAO(Vector3 pos, string name) {
+        if (!aoCache.ContainsKey(name))
+            return;
+
+        ArtObject ao = aoCache[name];
+
+        ArtObjectInstance newImport = new ArtObjectInstance();
+
+        newImport.ArtObjectName=name;
+        newImport.Position=pos;
+        newImport.Scale=Vector3.one;
+
+        GameObject newTrile;
+
+        if (aoObjectCache.Count>0) {
+            newTrile=aoObjectCache[0];
+            aoObjectCache.RemoveAt(0);
+            newTrile.SetActive(true);
+        } else {
+            newTrile=Instantiate(aoPrefab);
+        }
+
+        MeshFilter mf = newTrile.GetComponent<MeshFilter>();
+        MeshRenderer mr = newTrile.GetComponent<MeshRenderer>();
+        MeshCollider mc = newTrile.GetComponent<MeshCollider>();
+        ArtObjectImported aoI = newTrile.GetComponent<ArtObjectImported>();
+
+        aoI.myInstance=newImport;
+
+        mr.material=FezToUnity.GeometryToMaterial(aoCache[name].Cubemap);
+        mf.mesh=aoMeshCache[aoCache[name]];
+        mc.sharedMesh=aoMeshCache[aoCache[name]];
+
+        newTrile.transform.position=pos;
+        newTrile.transform.rotation=newImport.Rotation;
+
+        newTrile.name=name;
+        newTrile.transform.parent=transform.FindChild("ArtObjects");
+
     }
 
     [SerializeField]

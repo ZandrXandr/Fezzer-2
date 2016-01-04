@@ -21,6 +21,7 @@ public class CameraEditor : MonoBehaviour {
     }
 
     bool isWire;
+    public static string aoName;
 
 	// Use this for initialization
 	void Start () {
@@ -83,9 +84,6 @@ public class CameraEditor : MonoBehaviour {
             } else if (PlacmentPreview.Instance.gameObject.activeSelf)
                 PlacmentPreview.Instance.gameObject.SetActive(false);
         }
-        if (Input.GetKeyDown(KeyCode.S)) {
-            LevelManager.Instance.SaveLevel();
-        }
 
         if (Input.GetMouseButtonDown(0)) {
             RaycastHit rh;
@@ -94,8 +92,13 @@ public class CameraEditor : MonoBehaviour {
 
                 Debug.DrawLine(rh.point, transform.position, Color.red, 15f);
 
-                TrileEmplacement place = new TrileEmplacement((int)rh.transform.position.x, (int)rh.transform.position.y, (int)rh.transform.position.z);
-                LevelManager.Instance.RemoveTrile(place);
+                if (isTrile) {
+                    TrileEmplacement place = new TrileEmplacement((int)rh.transform.position.x, (int)rh.transform.position.y, (int)rh.transform.position.z);
+                    LevelManager.Instance.RemoveTrile(place);
+                } else {
+                    Vector3 pos = roundToGrid(16, new Vector3(rh.point.x+((rh.normal.x)*placeMagnitude), rh.point.y+((rh.normal.y)*placeMagnitude), rh.point.z+((rh.normal.z)*placeMagnitude)));
+                    LevelManager.Instance.GenerateAO(pos, aoName);
+                }
 
             }
 
@@ -110,8 +113,10 @@ public class CameraEditor : MonoBehaviour {
                 Debug.DrawLine(rh.point, transform.position, Color.green, 15f);
                 Debug.DrawLine(rh.point, rh.point+rh.normal, Color.blue, 15f);
 
-                TrileEmplacement place = new TrileEmplacement(Mathf.RoundToInt(rh.point.x+((rh.normal.x)*placeMagnitude)), Mathf.RoundToInt(rh.point.y+((rh.normal.y)*placeMagnitude)), Mathf.RoundToInt(rh.point.z+((rh.normal.z)*placeMagnitude)));
-                LevelManager.Instance.RegenTrile(place);
+                if (isTrile) {
+                    TrileEmplacement place = new TrileEmplacement(Mathf.RoundToInt(rh.point.x+((rh.normal.x)*placeMagnitude)), Mathf.RoundToInt(rh.point.y+((rh.normal.y)*placeMagnitude)), Mathf.RoundToInt(rh.point.z+((rh.normal.z)*placeMagnitude)));
+                    LevelManager.Instance.RegenTrile(place);
+                }
 
             }
         }
