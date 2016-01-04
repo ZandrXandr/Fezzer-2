@@ -12,19 +12,31 @@ public class CameraEditor : MonoBehaviour {
 
     public EditMode myMode;
 
+    public static float placeMagnitude=1;
+
     public int setMode {
         set {
             myMode=(EditMode)value;
         }
     }
 
+    bool isWire;
+
 	// Use this for initialization
 	void Start () {
         resourcePath.text=PlayerPrefs.GetString("path");
 	}
-	
-	// Update is called once per frame
-	void Update () {
+
+    void OnPreRender() {
+        if(isWire)
+            GL.wireframe=true;
+    }
+
+    // Update is called once per frame
+    void Update () {
+
+        if (Input.GetKeyDown(KeyCode.Period))
+            isWire=!isWire;
 
         if (Input.GetKeyDown(KeyCode.Y)) {
             Application.CaptureScreenshot(Application.dataPath+"Screenshot.png",3);
@@ -64,7 +76,10 @@ public class CameraEditor : MonoBehaviour {
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out rh)) {
                 if (!PlacmentPreview.Instance.gameObject.activeSelf)
                     PlacmentPreview.Instance.gameObject.SetActive(true);
-                PlacmentPreview.Instance.transform.position=new Vector3(Mathf.RoundToInt(rh.transform.position.x+rh.normal.x), Mathf.RoundToInt(rh.transform.position.y+rh.normal.y), Mathf.RoundToInt(rh.transform.position.z+rh.normal.z));
+                if(isTrile)
+                    PlacmentPreview.Instance.transform.position=new Vector3(Mathf.RoundToInt(rh.point.x+((rh.normal.x)*placeMagnitude)), Mathf.RoundToInt(rh.point.y+((rh.normal.y)*placeMagnitude)), Mathf.RoundToInt(rh.point.z+((rh.normal.z)*placeMagnitude)));
+                else
+                    PlacmentPreview.Instance.transform.position=roundToGrid(16,new Vector3(rh.point.x+((rh.normal.x)*placeMagnitude), rh.point.y+((rh.normal.y)*placeMagnitude),rh.point.z+((rh.normal.z)*placeMagnitude)));
             } else if (PlacmentPreview.Instance.gameObject.activeSelf)
                 PlacmentPreview.Instance.gameObject.SetActive(false);
         }
@@ -95,7 +110,7 @@ public class CameraEditor : MonoBehaviour {
                 Debug.DrawLine(rh.point, transform.position, Color.green, 15f);
                 Debug.DrawLine(rh.point, rh.point+rh.normal, Color.blue, 15f);
 
-                TrileEmplacement place = new TrileEmplacement(Mathf.RoundToInt(rh.point.x+rh.normal.x), Mathf.RoundToInt(rh.point.y+rh.normal.y), Mathf.RoundToInt(rh.point.z+rh.normal.z));
+                TrileEmplacement place = new TrileEmplacement(Mathf.RoundToInt(rh.point.x+((rh.normal.x)*placeMagnitude)), Mathf.RoundToInt(rh.point.y+((rh.normal.y)*placeMagnitude)), Mathf.RoundToInt(rh.point.z+((rh.normal.z)*placeMagnitude)));
                 LevelManager.Instance.RegenTrile(place);
 
             }
@@ -116,7 +131,7 @@ public class CameraEditor : MonoBehaviour {
 
     TrileEmplacement preTrileMove;
 
-    public bool isTrile;
+    public static bool isTrile;
 
     float dist = 1;
 
@@ -137,9 +152,9 @@ public class CameraEditor : MonoBehaviour {
                     ObjectProperties.Instance.SetToTrile(lastTrile.myInstance.TrileId);
                 } else if (rh.transform.tag=="ArtObject") {
                     lastAO=rh.transform.GetComponent<ArtObjectImported>();
-                    aoBounds=LevelManager.Instance.getAOBounds(lastAO.myInstance.Id);
+                    aoBounds=LevelManager.Instance.getAOBounds(lastAO.myInstance.ArtObjectName);
                     isTrile=false;
-                    ObjectProperties.Instance.SetToAO(lastAO.myInstance.Id);
+                    ObjectProperties.Instance.SetToAO(lastAO.myInstance.ArtObjectName);
                 }
             }
         } else if (Input.GetMouseButtonDown(1)) {
@@ -169,11 +184,11 @@ public class CameraEditor : MonoBehaviour {
                     if (lastAO==null) {
                         isTrile=false;
                         lastAO=rh.transform.GetComponent<ArtObjectImported>();
-                        aoBounds=LevelManager.Instance.getAOBounds(lastAO.myInstance.Id);
+                        aoBounds=LevelManager.Instance.getAOBounds(lastAO.myInstance.ArtObjectName);
                     } else if (rh.transform!=lastAO.transform) {
                         isTrile=false;
                         lastAO=rh.transform.GetComponent<ArtObjectImported>();
-                        aoBounds=LevelManager.Instance.getAOBounds(lastAO.myInstance.Id);
+                        aoBounds=LevelManager.Instance.getAOBounds(lastAO.myInstance.ArtObjectName);
                     }
                 }
                 objectDragging.SetNormalAndPosition(rh.normal,rh.point);
@@ -322,6 +337,7 @@ public class CameraEditor : MonoBehaviour {
     Material lineMatTrile,lineMatAO;
 
     void OnPostRender() {
+        GL.wireframe=false;
         GL.PushMatrix();
         lineMatTrile.SetPass(0);
 

@@ -49,7 +49,7 @@ public class ObjectProperties : Singleton<ObjectProperties> {
                     return;
 
                 if (value.Length>0) {
-                    LevelManager.Instance.ChangeAOKeyTo(id, int.Parse(value));
+                    //LevelManager.Instance.ChangeAOKeyTo(,);
                     id=int.Parse(value);
                 }
             }
@@ -76,7 +76,7 @@ public class ObjectProperties : Singleton<ObjectProperties> {
         UpdateFields();
     }
 
-    public void SetToAO(int aoID) {
+    public void SetToAO(string aoID) {
         isTrile=false;
         ao=LevelManager.Instance.GetAO(aoID);
         UpdateFields();
@@ -96,8 +96,8 @@ public class ObjectProperties : Singleton<ObjectProperties> {
                 return;
 
             nameInput.text=ao.Name;
-            idInput.text=LevelManager.Instance.GetAOId(ao).ToString();
-            id=int.Parse(idInput.text);
+            idInput.text="NOID";
+            //id=int.Parse(idInput.text);
         }
         skip=false;
     }

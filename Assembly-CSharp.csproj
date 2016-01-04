@@ -53,8 +53,9 @@
      <Compile Include="Assets\Custom Assets\Scripts\FezEditor\PlacmentPreview.cs" />
      <Compile Include="Assets\Custom Assets\Scripts\FezEditor\RotatingTrile.cs" />
      <Compile Include="Assets\Custom Assets\Scripts\FezEditor\SkyColorManager.cs" />
-     <Compile Include="Assets\Custom Assets\Scripts\FezEditor\TrileButton.cs" />
+     <Compile Include="Assets\Custom Assets\Scripts\FezEditor\UI\AOButton.cs" />
      <Compile Include="Assets\Custom Assets\Scripts\FezEditor\UI\ObjectProperties.cs" />
+     <Compile Include="Assets\Custom Assets\Scripts\FezEditor\UI\TrileButton.cs" />
      <Compile Include="Assets\Custom Assets\Scripts\Generic\Bezier.cs" />
      <Compile Include="Assets\Custom Assets\Scripts\Generic\FollowObjectPos.cs" />
      <Compile Include="Assets\Custom Assets\Scripts\Generic\GameTimer.cs" />

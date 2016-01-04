@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FezEngine.Structure;
 using System.Threading;
 using FmbLib;
-
 using System.IO;
 
 public class LevelManager : Singleton<LevelManager> {
@@ -39,7 +39,7 @@ public class LevelManager : Singleton<LevelManager> {
 
     Dictionary<Trile, Mesh> trilesetCache = new Dictionary<Trile, Mesh>();
     Dictionary<ArtObject, Mesh> aoMeshCache = new Dictionary<ArtObject,Mesh>();
-    Dictionary<int, ArtObject> aoCache = new Dictionary<int, ArtObject>();
+    Dictionary<string, ArtObject> aoCache = new Dictionary<string, ArtObject>();
 
     [HideInInspector]
     public static TrileSet s;
@@ -50,14 +50,38 @@ public class LevelManager : Singleton<LevelManager> {
         currTrileID=int.Parse(toPick.name);
         ObjectProperties.Instance.SetToTrile(currTrileID);
         PlacmentPreview.Instance.mf.mesh=trilesetCache[s.Triles[currTrileID]];
+        PlacmentPreview.Instance.mr.material.mainTexture=s.TextureAtlas;
         RotatingTrile.Instance.mf.mesh=trilesetCache[s.Triles[currTrileID]];
+        CameraEditor.placeMagnitude=getTrileBounds(currTrileID).size.magnitude;
+        CameraEditor.isTrile=true;
     }
 
     public void PickTrile(int id) {
         currTrileID=id;
         ObjectProperties.Instance.SetToTrile(currTrileID);
         PlacmentPreview.Instance.mf.mesh=trilesetCache[s.Triles[currTrileID]];
+        PlacmentPreview.Instance.mr.material.mainTexture=s.TextureAtlas;
         RotatingTrile.Instance.mf.mesh=trilesetCache[s.Triles[currTrileID]];
+        CameraEditor.placeMagnitude=getTrileBounds(currTrileID).size.magnitude;
+        CameraEditor.isTrile=true;
+    }
+
+    public void PickAO(GameObject toPick) {
+        ObjectProperties.Instance.SetToAO(toPick.name);
+        PlacmentPreview.Instance.mf.mesh=aoMeshCache[aoCache[toPick.name]];
+        PlacmentPreview.Instance.mr.material.mainTexture=aoCache[toPick.name].Cubemap;
+        CameraEditor.placeMagnitude=getAOBounds(toPick.name).size.magnitude;
+        CameraEditor.isTrile=false;
+
+    }
+
+    public void PickAO(string id) {
+        ObjectProperties.Instance.SetToAO(id);
+        PlacmentPreview.Instance.mf.mesh=aoMeshCache[aoCache[id]];
+        PlacmentPreview.Instance.mr.material.mainTexture=aoCache[id].Cubemap;
+        CameraEditor.placeMagnitude=getAOBounds(id).size.magnitude;
+        CameraEditor.isTrile=false;
+
     }
 
     public void LoadLevel() {
@@ -65,14 +89,7 @@ public class LevelManager : Singleton<LevelManager> {
         LoadLevel(levelName);
     }
 
-    public int GetAOId(ArtObject input) {
-        foreach (KeyValuePair<int, ArtObject> kvp in aoCache)
-            if (kvp.Value==input)
-                return kvp.Key;
-        return 0;
-    }
-
-    public void ChangeAOKeyTo(int prev, int curr) {
+    public void ChangeAOKeyTo(string prev, string curr) {
         if (!aoCache.ContainsKey(prev) && !aoCache.ContainsKey(curr))
             return;
         ArtObject reference =aoCache[prev];
@@ -81,8 +98,8 @@ public class LevelManager : Singleton<LevelManager> {
         aoCache.Add(curr,reference);
     }
 
-    public ArtObject GetAO(int id) {
-        return aoCache[id];
+    public ArtObject GetAO(string name) {
+        return aoCache[name];
     }
     public Trile GetTrile(int id) {
         return s.Triles[id];
@@ -117,8 +134,8 @@ public class LevelManager : Singleton<LevelManager> {
 
         List<GameObject> toDestroy = new List<GameObject>();
 
-        for(int i = 0; i < toParent.childCount; i++) {
-            toDestroy.Add(toParent.GetChild(i).gameObject);
+        for(int i = 0; i < toParentTrile.childCount; i++) {
+            toDestroy.Add(toParentTrile.GetChild(i).gameObject);
         }
 
         while (toDestroy.Count>0) {
@@ -164,6 +181,7 @@ public class LevelManager : Singleton<LevelManager> {
 
         StartCoroutine(LoadLevelCoroutine());
         ListTrilesUnderUI();
+        ListAOUnderUI();
         SkyColorManager.Instance.Load();
     }
 
@@ -186,15 +204,15 @@ public class LevelManager : Singleton<LevelManager> {
             string path = OutputPath.OutputPathDir+"art objects/"+ao.Value.ArtObjectName.ToLower()+".xnb";
 
             ArtObject aoL = FmbUtil.ReadObject<ArtObject>(path);
-            if (aoCache.ContainsKey(ao.Key)) {
-                aoCache[ao.Key]=aoL;
-            } else aoCache.Add(ao.Key,aoL);
+            if (aoCache.ContainsKey(aoL.Name)) {
+                continue;
+            } else aoCache.Add(aoL.Name,aoL);
         }
     }
 
     public void LoadAOMeshes() {
         foreach(ArtObjectInstance ao in loaded.ArtObjects.Values) {
-            ArtObject aoL = aoCache[ao.Id];
+            ArtObject aoL = aoCache[ao.ArtObjectName];
             if (aoMeshCache.ContainsKey(aoL))
                 continue;
             aoMeshCache.Add(aoL,FezToUnity.ArtObjectToMesh(aoL));
@@ -361,9 +379,9 @@ public class LevelManager : Singleton<LevelManager> {
 
                     aoI.myInstance=kvp.Value;
 
-                    mr.material=FezToUnity.GeometryToMaterial(aoCache[kvp.Key].Cubemap);
-                    mf.mesh=aoMeshCache[aoCache[kvp.Key]];
-                    mc.sharedMesh=aoMeshCache[aoCache[kvp.Key]];
+                    mr.material=FezToUnity.GeometryToMaterial(aoCache[kvp.Value.ArtObjectName].Cubemap);
+                    mf.mesh=aoMeshCache[aoCache[kvp.Value.ArtObjectName]];
+                    mc.sharedMesh=aoMeshCache[aoCache[kvp.Value.ArtObjectName]];
 
                     newTrile.transform.position=kvp.Value.Position-(Vector3.one/2);
                     newTrile.transform.rotation=kvp.Value.Rotation;
@@ -532,22 +550,20 @@ public class LevelManager : Singleton<LevelManager> {
     }
 
     [SerializeField]
-    RectTransform toParent;
+    RectTransform toParentTrile,toParentAO;
     [SerializeField]
-    GameObject buttonPrefab;
+    GameObject trileButtonPrefab,aoButtonPrefab;
 
     int columnCount = 4;
 
     void ListTrilesUnderUI() {
 
-        int x = 0,y=0;
-
         int trileSize = 15;
 
         foreach (KeyValuePair<int, Trile> t in s.Triles) {
 
-            GameObject newButton = Instantiate(buttonPrefab);
-            newButton.transform.parent=toParent;
+            GameObject newButton = Instantiate(trileButtonPrefab);
+            newButton.transform.SetParent(toParentTrile);
 
             newButton.transform.name=t.Key.ToString();
 
@@ -556,13 +572,13 @@ public class LevelManager : Singleton<LevelManager> {
             int pX = Mathf.FloorToInt(s.TextureAtlas.width*t.Value.AtlasOffset.x);
             int pY = Mathf.FloorToInt(s.TextureAtlas.height*t.Value.AtlasOffset.y);
 
-            for (int x2 = 1; x2<=trileSize; x2++) {
-                for (int y2 = 0; y2<trileSize; y2++) {
+            for (int x = 1; x<=trileSize; x++) {
+                for (int y = 0; y<trileSize; y++) {
 
-                    Color c = s.TextureAtlas.GetPixel(pX+x2, pY+y2);
+                    Color c = s.TextureAtlas.GetPixel(pX+x, pY+y);
                     c.a=1;
 
-                    newTexture.SetPixel((trileSize-x2)%trileSize,trileSize-y2,c);
+                    newTexture.SetPixel((trileSize-x)%trileSize,trileSize-y,c);
                 }
             }
 
@@ -570,14 +586,46 @@ public class LevelManager : Singleton<LevelManager> {
             newTexture.filterMode=FilterMode.Point;
             newTexture.wrapMode=TextureWrapMode.Clamp;
 
-            newButton.GetComponentInChildren<UnityEngine.UI.RawImage>().texture=newTexture;
-            newButton.GetComponentInChildren<UnityEngine.UI.Text>().text=t.Key.ToString();
+            newButton.transform.GetChild(0).GetComponent<RawImage>().texture=newTexture;
+            newButton.transform.GetChild(1).GetComponent<Text>().text=t.Key.ToString();
+        }
 
-            x++;
-            if (x>=columnCount) {
-                y++;
-                x=0;
+    }
+
+    void ListAOUnderUI() {
+
+        HashSet<ArtObject> generatedAOs = new HashSet<ArtObject>();
+
+        foreach (KeyValuePair<string, ArtObject> kvp in aoCache) {
+            if (generatedAOs.Contains(kvp.Value))
+                continue;
+
+            GameObject newButton = Instantiate(aoButtonPrefab);
+            newButton.transform.SetParent(toParentAO);
+
+            newButton.transform.name=kvp.Value.Name;
+
+            int aoSize = kvp.Value.Cubemap.height;
+
+            Texture2D aoTex = new Texture2D(aoSize, aoSize);
+
+            for (int x = 0; x<aoSize; x++) {
+                for (int y = 0; y<aoSize; y++) {
+                    Color c = kvp.Value.Cubemap.GetPixel(x,y);
+
+                    c.a=1;
+
+                    aoTex.SetPixel(x,aoSize-y,c);
+                }
             }
+
+            aoTex.Apply();
+            aoTex.filterMode=FilterMode.Point;
+            aoTex.wrapMode=TextureWrapMode.Clamp;
+
+            newButton.transform.GetChild(0).GetComponent<RawImage>().texture=aoTex;
+
+            generatedAOs.Add(kvp.Value);
         }
 
     }
@@ -605,8 +653,8 @@ public class LevelManager : Singleton<LevelManager> {
 
     }
 
-    public Bounds getAOBounds(int id) {
-        return aoMeshCache[aoCache[id]].bounds;
+    public Bounds getAOBounds(string name) {
+        return aoMeshCache[aoCache[name]].bounds;
     }
     public Bounds getTrileBounds(int id) {
         return trilesetCache[s.Triles[id]].bounds;
