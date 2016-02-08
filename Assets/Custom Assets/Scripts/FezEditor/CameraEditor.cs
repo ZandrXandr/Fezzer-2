@@ -62,6 +62,9 @@ public class CameraEditor : MonoBehaviour {
         PlayerPrefs.Save();
     }
 
+    //TODO add object rotation in this mode, probably with A and D
+    int rotation = 0;
+
     void WorldEdtiorMode() {
 
         if (!Input.GetKey(KeyCode.E)) {
@@ -90,8 +93,6 @@ public class CameraEditor : MonoBehaviour {
 
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out rh)) {
 
-                Debug.DrawLine(rh.point, transform.position, Color.red, 15f);
-
                 if (isTrile) {
                     TrileEmplacement place = new TrileEmplacement((int)rh.transform.position.x, (int)rh.transform.position.y, (int)rh.transform.position.z);
                     LevelManager.Instance.RemoveTrile(place);
@@ -110,9 +111,6 @@ public class CameraEditor : MonoBehaviour {
 
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out rh)) {
 
-                Debug.DrawLine(rh.point, transform.position, Color.green, 15f);
-                Debug.DrawLine(rh.point, rh.point+rh.normal, Color.blue, 15f);
-
                 if (isTrile) {
                     TrileEmplacement place = new TrileEmplacement(Mathf.RoundToInt(rh.point.x+((rh.normal.x)*placeMagnitude)), Mathf.RoundToInt(rh.point.y+((rh.normal.y)*placeMagnitude)), Mathf.RoundToInt(rh.point.z+((rh.normal.z)*placeMagnitude)));
                     LevelManager.Instance.RegenTrile(place);
@@ -121,7 +119,7 @@ public class CameraEditor : MonoBehaviour {
             }
         }
 
-        if (Input.GetMouseButtonDown(3)) {
+        if (Input.GetMouseButtonDown(2)) {
             RaycastHit rh;
 
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out rh)) {
@@ -164,6 +162,16 @@ public class CameraEditor : MonoBehaviour {
             }
         } else if (Input.GetMouseButtonDown(1)) {
             //PropertiesEditor.Instance.SelectLevel();
+        }
+
+        if(Input.GetKeyDown(KeyCode.Backspace) ||Input.GetKeyDown(KeyCode.Delete)) {
+            if (isTrile) {
+                LevelManager.Instance.RemoveTrile(new TrileEmplacement((int)lastTrile.transform.position.x, (int)lastTrile.transform.position.y, (int)lastTrile.transform.position.z));
+            } else {
+                LevelManager.Instance.RemoveAO(lastAO);
+            }
+
+            return;
         }
 
         //If we right click
@@ -217,7 +225,7 @@ public class CameraEditor : MonoBehaviour {
 
         if (Input.GetMouseButton(1)) {
 
-            distOffset-=Input.mouseScrollDelta.y/10;
+            distOffset-=Input.mouseScrollDelta.y/13;
 
             distOffset=Mathf.Clamp(distOffset,-1,1);
 
@@ -237,8 +245,8 @@ public class CameraEditor : MonoBehaviour {
 
                 if (objectDragging.Raycast(cam, out pos)) {
                     lastTrile.transform.position=cam.GetPoint(pos)+(objectDragging.normal/2);
-                    lastTrile.transform.position-=trileBounds.center;
-                    lastTrile.transform.position+=transform.forward*distOffset;
+                    lastTrile.transform.position+=trileBounds.center;
+                    lastTrile.transform.position+=objectDragging.normal*distOffset;
                 }
 
             } else {
@@ -251,8 +259,8 @@ public class CameraEditor : MonoBehaviour {
 
                 if (objectDragging.Raycast(cam, out pos)) {
                     lastAO.transform.position=cam.GetPoint(pos)-(objectDragging.normal/2);
-                    lastAO.transform.position-=aoBounds.center;
-                    lastAO.transform.position+=transform.forward*distOffset;
+                    lastAO.transform.position+=aoBounds.center;
+                    lastAO.transform.position+=objectDragging.normal*distOffset;
                 }
             }
         }

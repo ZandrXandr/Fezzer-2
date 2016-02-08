@@ -70,7 +70,7 @@ public class LevelManager : Singleton<LevelManager> {
         ObjectProperties.Instance.SetToAO(toPick.name);
         PlacmentPreview.Instance.mf.mesh=aoMeshCache[aoCache[toPick.name]];
         PlacmentPreview.Instance.mr.material.mainTexture=aoCache[toPick.name].Cubemap;
-        CameraEditor.placeMagnitude=getAOBounds(toPick.name).size.magnitude*0.45f;
+        CameraEditor.placeMagnitude=0.45f;
         CameraEditor.isTrile=false;
         CameraEditor.aoName=toPick.name;
     }
@@ -79,7 +79,7 @@ public class LevelManager : Singleton<LevelManager> {
         ObjectProperties.Instance.SetToAO(id);
         PlacmentPreview.Instance.mf.mesh=aoMeshCache[aoCache[id]];
         PlacmentPreview.Instance.mr.material.mainTexture=aoCache[id].Cubemap;
-        CameraEditor.placeMagnitude=getAOBounds(id).size.magnitude*0.45f;
+        CameraEditor.placeMagnitude=0.45f;
         CameraEditor.isTrile=false;
         CameraEditor.aoName=id;
     }
@@ -103,6 +103,21 @@ public class LevelManager : Singleton<LevelManager> {
     }
     public Trile GetTrile(int id) {
         return s.Triles[id];
+    }
+
+    public void CacheTrile(GameObject toCache) {
+        Transform triles = transform.FindChild("Triles");
+
+        toCache.transform.SetParent(triles);
+        toCache.SetActive(false);
+        trileObjectCache.Add(toCache);
+    }
+    public void CacheAO(GameObject toCache) {
+        Transform triles = transform.FindChild("ArtObjects");
+
+        toCache.transform.SetParent(triles);
+        toCache.SetActive(false);
+        trileObjectCache.Add(toCache);
     }
 
     void UnloadLevel() {
@@ -452,8 +467,8 @@ public class LevelManager : Singleton<LevelManager> {
         if (!loaded.Triles.ContainsKey(atPos))
             return;
         loaded.Triles.Remove(atPos);
-        
-        Destroy(trileObjects[atPos]);
+
+        CacheTrile(trileObjects[atPos]);
         trileObjects.Remove(atPos);
 
         TrileEmplacement[] checkPos = new TrileEmplacement[6];
@@ -470,6 +485,23 @@ public class LevelManager : Singleton<LevelManager> {
         foreach (TrileEmplacement t in checkPos) {
             GenerateTrile(t);
         }
+    }
+
+    public void RemoveAO(ArtObjectImported aoI) {
+        if (!loaded.ArtObjects.ContainsValue(aoI.myInstance))
+            return;
+
+        int removeIndex=0;
+        foreach (KeyValuePair<int, ArtObjectInstance> kvp in loaded.ArtObjects) {
+            if (kvp.Value==aoI.myInstance) {
+                removeIndex=kvp.Key;
+                break;
+            }
+        }
+
+        loaded.ArtObjects.Remove(removeIndex);
+
+        CacheAO(aoI.gameObject);        
     }
 
     void UpdateCulling(TrileEmplacement around) {
