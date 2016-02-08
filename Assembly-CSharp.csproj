@@ -54,6 +54,7 @@
      <Compile Include="Assets\Custom Assets\Scripts\FezEditor\RotatingTrile.cs" />
      <Compile Include="Assets\Custom Assets\Scripts\FezEditor\SkyColorManager.cs" />
      <Compile Include="Assets\Custom Assets\Scripts\FezEditor\UI\AOButton.cs" />
+     <Compile Include="Assets\Custom Assets\Scripts\FezEditor\UI\AOImporter.cs" />
      <Compile Include="Assets\Custom Assets\Scripts\FezEditor\UI\EditorRegion.cs" />
      <Compile Include="Assets\Custom Assets\Scripts\FezEditor\UI\ObjectProperties.cs" />
      <Compile Include="Assets\Custom Assets\Scripts\FezEditor\UI\PropertiesSelector.cs" />

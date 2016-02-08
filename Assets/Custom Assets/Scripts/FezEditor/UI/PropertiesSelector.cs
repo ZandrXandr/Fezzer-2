@@ -12,6 +12,10 @@ public class PropertiesSelector : MonoBehaviour {
         }
     }
 
+    void Start() {
+        setInt(0);
+    }
+
     void setInt(int set) {
 
         if (set==0) {

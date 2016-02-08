@@ -213,6 +213,26 @@ public class LevelManager : Singleton<LevelManager> {
         }
     }
 
+    public void LoadArtObject(string name) {
+
+        Debug.Log("Load");
+
+        string path = OutputPath.OutputPathDir+"art objects/"+name.ToLower()+".xnb";
+
+        ArtObject aoL = FmbUtil.ReadObject<ArtObject>(path);
+        if (aoCache.ContainsKey(aoL.Name)) 
+            return;
+        else aoCache.Add(aoL.Name, aoL);
+
+        Debug.Log("Cached");
+
+        if (!aoMeshCache.ContainsKey(aoL))
+            aoMeshCache.Add(aoL,FezToUnity.ArtObjectToMesh(aoL));
+
+        ListAOUnderUI();
+        Debug.Log("Displayed");
+    }
+
     public void LoadUsedArtObjects() {
         foreach (KeyValuePair<int, ArtObjectInstance> ao in loaded.ArtObjects) {
 
@@ -666,6 +686,12 @@ public class LevelManager : Singleton<LevelManager> {
     }
 
     void ListAOUnderUI() {
+
+        List<GameObject> children = new List<GameObject>();
+        foreach (Transform tran in toParentAO) {
+            children.Add(tran.gameObject);
+        }
+        children.ForEach(child => Destroy(child));
 
         HashSet<ArtObject> generatedAOs = new HashSet<ArtObject>();
 
