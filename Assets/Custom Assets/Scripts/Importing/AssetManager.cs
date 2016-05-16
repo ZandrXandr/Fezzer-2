@@ -36,7 +36,7 @@ public class AssetManager {
         string filePathXNB = OutputPath.OutputPathDir+"trile sets/"+toLoad+".xnb";
 
         if(!File.Exists(filePathXNB) ) {
-            Debug.LogError("No model!");
+            Debug.LogError("No trileset at path " + filePathXNB);
             return;
         }
 

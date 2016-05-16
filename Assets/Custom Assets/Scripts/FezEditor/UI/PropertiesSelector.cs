@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class PropertiesSelector : MonoBehaviour {
 
-    public GameObject levelProp, objectProp, editorProp;
+    public List<GameObject> objects;
     
     public int SetProperties {
         set {
@@ -19,24 +19,19 @@ public class PropertiesSelector : MonoBehaviour {
     void setInt(int set) {
 
         if (set==0) {
-            levelProp.SetActive(false);
-            objectProp.SetActive(false);
-            editorProp.SetActive(false);
-        }
-        if (set==1) {
-            levelProp.SetActive(true);
-            objectProp.SetActive(false);
-            editorProp.SetActive(false);
-        }
-        if (set==2) {
-            levelProp.SetActive(false);
-            objectProp.SetActive(true);
-            editorProp.SetActive(false);
-        }
-        if (set==3) {
-            levelProp.SetActive(false);
-            objectProp.SetActive(false);
-            editorProp.SetActive(true);
+            foreach (GameObject g in objects) {
+                g.SetActive(false);
+            }
+        } else {
+            int id = set-1;
+            if (id>=objects.Count)
+                return;
+
+            foreach (GameObject g in objects) {
+                g.SetActive(false);
+            }
+
+            objects[id].SetActive(true);
         }
 
     }

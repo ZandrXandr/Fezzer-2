@@ -59,6 +59,7 @@ class FezToUnity {
 
         m.RecalculateNormals();
         m.Optimize();
+        m.name=t.Name;
 
         return m;
     }
