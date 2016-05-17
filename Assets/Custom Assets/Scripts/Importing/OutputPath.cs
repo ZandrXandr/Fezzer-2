@@ -18,7 +18,7 @@ public class OutputPath : MonoBehaviour {
     }
 
 
-    void Start() {
+    void Awake() {
         if (useEditor) {
             setPath=editorString;
         }

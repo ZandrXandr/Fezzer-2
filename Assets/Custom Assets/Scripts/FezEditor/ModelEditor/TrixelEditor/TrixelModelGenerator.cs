@@ -12,7 +12,7 @@ public class TrixelModelGenerator {
     static int faceCount = 0;
     static Vector2 uvPos,trixelUVSize;
 
-    public static Mesh GetDataMesh(bool[,,] data, Vector2 _uvPos, Vector2 _trileUVSize) {
+    public static Mesh GetDataMesh(HashSet<IntPos> data, Vector2 _uvPos, Vector2 _trileUVSize) {
         Mesh m = new Mesh();
         uvPos=_uvPos;
         trixelUVSize=_trileUVSize;
@@ -49,22 +49,22 @@ public class TrixelModelGenerator {
         return m;
     }
 
-    private static void GenerateWestFaces(bool[,,] data, int x) {
+    private static void GenerateWestFaces(HashSet<IntPos> data, int x) {
         //The trixels we've checked already.
         bool[,] mask = new bool[16, 16];
         for (int z = 0; z<16; z++) {
             for (int y = 0; y<16; y++) {
-                if (mask[z, y]||!data[x, y, z]) {
+                if (mask[z, y]||!data.Contains(new IntPos(x,y, z))) {
                     continue;
                 }
                 int width = 0;
                 int height = 0;
                 //Calculate width
                 for (int w = z; w<16; w++) {
-                    if (mask[w, y]||!data[x, y, w])
+                    if (mask[w, y]||!data.Contains(new IntPos(x, y, w)))
                         break;
                     if (x>0)
-                        if (data[x-1, y, w])
+                        if (data.Contains(new IntPos(x-1, y, w)))
                             break;
                     width++;
                 }
@@ -76,10 +76,10 @@ public class TrixelModelGenerator {
                 for (int h = y; h<16; h++) {
                     bool continueIterating = true;
                     for (int w = 0; w<width; w++) {
-                        if (mask[z+w, h]||!data[x, h, z+w])
+                        if (mask[z+w, h]||!data.Contains(new IntPos(x, h, z+w)))
                             continueIterating=false;
                         if (x>0)
-                            if (data[x-1, h, z+w])
+                            if (data.Contains(new IntPos(x-1, h, z+w)))
                                 continueIterating=false;
                         if (!continueIterating)
                             break;
@@ -103,22 +103,22 @@ public class TrixelModelGenerator {
         }
     }
 
-    private static void GenerateEastFaces(bool[,,] data, int x) {
+    private static void GenerateEastFaces(HashSet<IntPos> data, int x) {
         //The trixels we've checked already.
         bool[,] mask = new bool[16, 16];
         for (int z = 0; z<16; z++) {
             for (int y = 0; y<16; y++) {
-                if (mask[z, y]||!data[x, y, z]) {
+                if (mask[z, y]||!data.Contains(new IntPos(x, y, z))) {
                     continue;
                 }
                 int width = 0;
                 int height = 0;
                 //Calculate width
                 for (int w = z; w<16; w++) {
-                    if (mask[w, y]||!data[x, y, w])
+                    if (mask[w, y]||!data.Contains(new IntPos(x, y, w)))
                         break;
                     if (x<15)
-                        if (data[x+1, y, w])
+                        if (data.Contains(new IntPos(x+1, y, w)))
                             break;
                     width++;
                 }
@@ -130,10 +130,10 @@ public class TrixelModelGenerator {
                 for (int h = y; h<16; h++) {
                     bool continueIterating = true;
                     for (int w = 0; w<width; w++) {
-                        if (mask[z+w, h]||!data[x, h, z+w])
+                        if (mask[z+w, h]||!data.Contains(new IntPos(x, h, z+w)))
                             continueIterating=false;
                         if (x<15)
-                            if (data[x+1, h, z+w])
+                            if (data.Contains(new IntPos(x+1, h, z+w)))
                                 continueIterating=false;
                         if (!continueIterating)
                             break;
@@ -157,22 +157,22 @@ public class TrixelModelGenerator {
         }
     }
 
-    private static void GenerateSouthFaces(bool[,,] data, int z) {
+    private static void GenerateSouthFaces(HashSet<IntPos> data, int z) {
         //The trixels we've checked already.
         bool[,] mask = new bool[16, 16];
         for (int x = 0; x<16; x++) {
             for (int y = 0; y<16; y++) {
-                if (mask[x, y]||!data[x, y, z]) {
+                if (mask[x, y]||!data.Contains(new IntPos(x, y, z))) {
                     continue;
                 }
                 int width = 0;
                 int height = 0;
                 //Calculate width
                 for (int w = x; w<16; w++) {
-                    if (mask[w, y]||!data[w, y, z])
+                    if (mask[w, y]||!data.Contains(new IntPos(w, y, z)))
                         break;
                     if (z>0)
-                        if (data[w, y, z-1])
+                        if (data.Contains(new IntPos(w, y, z-1)))
                             break;
                     width++;
                 }
@@ -184,10 +184,10 @@ public class TrixelModelGenerator {
                 for (int h = y; h<16; h++) {
                     bool continueIterating = true;
                     for (int w = 0; w<width; w++) {
-                        if (mask[x+w, h]||!data[x+w, h, z])
+                        if (mask[x+w, h]||!data.Contains(new IntPos(x+w, h, z)))
                             continueIterating=false;
                         if (z>0)
-                            if (data[x+w, h, z-1])
+                            if (data.Contains(new IntPos(x+w, h, z-1)))
                                 continueIterating=false;
                         if (!continueIterating)
                             break;
@@ -211,22 +211,22 @@ public class TrixelModelGenerator {
         }
     }
 
-    private static void GenerateNorthFaces(bool[,,] data, int z) {
+    private static void GenerateNorthFaces(HashSet<IntPos> data, int z) {
         //The trixels we've checked already.
         bool[,] mask = new bool[16, 16];
         for (int x = 0; x<16; x++) {
             for (int y = 0; y<16; y++) {
-                if (mask[x, y]||!data[x, y, z]) {
+                if (mask[x, y]||!data.Contains(new IntPos(x, y, z))) {
                     continue;
                 }
                 int width = 0;
                 int height = 0;
                 //Calculate width
                 for (int w = x; w<16; w++) {
-                    if (mask[w, y]||!data[w, y, z])
+                    if (mask[w, y]||!data.Contains(new IntPos(w, y, z)))
                         break;
                     if (z<15)
-                        if (data[w, y, z+1])
+                        if (data.Contains(new IntPos(w, y, z+1)))
                             break;
                     width++;
                 }
@@ -238,10 +238,10 @@ public class TrixelModelGenerator {
                 for (int h = y; h<16; h++) {
                     bool continueIterating = true;
                     for (int w = 0; w<width; w++) {
-                        if (mask[x+w, h]||!data[x+w, h, z])
+                        if (mask[x+w, h]||!data.Contains(new IntPos(x+w, h, z)))
                             continueIterating=false;
                         if (z<15)
-                            if (data[x+w, h, z+1])
+                            if (data.Contains(new IntPos(x+w, h, z+1)))
                                 continueIterating=false;
                         if (!continueIterating)
                             break;
@@ -265,22 +265,22 @@ public class TrixelModelGenerator {
         }
     }
 
-    private static void GenerateBottomFaces(bool[,,] data, int y) {
+    private static void GenerateBottomFaces(HashSet<IntPos> data, int y) {
         //The trixels we've checked already.
         bool[,] mask = new bool[16, 16];
         for (int x = 0; x<16; x++) {
             for (int z = 0; z<16; z++) {
-                if (mask[x, z]||!data[x, y, z]) {
+                if (mask[x, z]||!data.Contains(new IntPos(x, y, z))) {
                     continue;
                 }
                 int width = 0;
                 int height = 0;
                 //Calculate width
                 for (int w = x; w<16; w++) {
-                    if (mask[w, z]||!data[w, y, z])
+                    if (mask[w, z]||!data.Contains(new IntPos(w, y, z)))
                         break;
                     if (y>0)
-                        if (data[w, y-1, z])
+                        if (data.Contains(new IntPos(w, y-1, z)))
                             break;
                     width++;
                 }
@@ -292,10 +292,10 @@ public class TrixelModelGenerator {
                 for (int h = z; h<16; h++) {
                     bool continueIterating = true;
                     for (int w = 0; w<width; w++) {
-                        if (mask[x+w, h]||!data[x+w, y, h])
+                        if (mask[x+w, h]||!data.Contains(new IntPos(x+w, y, h)))
                             continueIterating=false;
                         if (y>0)
-                            if (data[x+w, y-1, h])
+                            if (data.Contains(new IntPos(x+w, y-1, h)))
                                 continueIterating=false;
                         if (!continueIterating)
                             break;
@@ -318,22 +318,22 @@ public class TrixelModelGenerator {
         }
     }
 
-    private static void GenerateTopFaces(bool[,,] data, int y) {
+    private static void GenerateTopFaces(HashSet<IntPos> data, int y) {
         //The trixels we've checked already.
         bool[,] mask = new bool[16, 16];
         for (int x = 0; x<16; x++) {
             for (int z = 0; z<16; z++) {
-                if (mask[x, z]||!data[x, y, z]) {
+                if (mask[x, z]||!data.Contains(new IntPos(x, y, z))) {
                     continue;
                 }
                 int width = 0;
                 int height = 0;
                 //Calculate width
                 for (int w = x; w<16; w++) {
-                    if (mask[w, z]||!data[w, y, z])
+                    if (mask[w, z]||!data.Contains(new IntPos(w, y, z)))
                         break;
                     if (y<15)
-                        if (data[w, y+1, z])
+                        if (data.Contains(new IntPos(w, y+1, z)))
                             break;
                     width++;
                 }
@@ -345,10 +345,10 @@ public class TrixelModelGenerator {
                 for (int h = z; h<16; h++) {
                     bool continueIterating = true;
                     for (int w = 0; w<width; w++) {
-                        if (mask[x+w, h]||!data[x+w, y, h])
+                        if (mask[x+w, h]||!data.Contains(new IntPos(x+w, y, h)))
                             continueIterating=false;
                         if (y<15)
-                            if (data[x+w, y+1, h])
+                            if (data.Contains(new IntPos(x+w, y+1, h)))
                                 continueIterating=false;
                         if (!continueIterating)
                             break;

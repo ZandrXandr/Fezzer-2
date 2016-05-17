@@ -29,12 +29,12 @@ public class TrileCameraMovement : MonoBehaviour {
 
         if (Input.GetKey(KeyCode.LeftShift)) {
             Vector3 move = new Vector3();
-            move-=transform.right*Input.GetAxis("Mouse X")*distance*0.02f;
-            move-=transform.up*Input.GetAxis("Mouse Y")*distance*0.02f;
+            move-=transform.right*Input.GetAxis("Mouse X")*0.02f;
+            move-=transform.up*Input.GetAxis("Mouse Y")*0.02f;
             offset+=move;
         } else if (Input.GetMouseButton(2)) {
-            x+=Input.GetAxis("Mouse X")*xSpeed*distance*0.02f;
-            y-=Input.GetAxis("Mouse Y")*ySpeed*distance*0.02f;
+            x+=Input.GetAxis("Mouse X")*xSpeed*distance*0.03f;
+            y-=Input.GetAxis("Mouse Y")*ySpeed*distance*0.03f;
         }
 
         y=ClampAngle(y, yMinLimit, yMaxLimit);

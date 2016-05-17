@@ -21,6 +21,7 @@ public class TrixelModelImporter : MonoBehaviour {
         importerObject=new GameObject();
         importerObject.name="Importer Collider";
         importerObject.transform.SetParent(transform);
+        importerObject.transform.localPosition=Vector3.zero;
         importerCollider=importerObject.AddComponent<MeshCollider>();
 	}
 
@@ -32,11 +33,15 @@ public class TrixelModelImporter : MonoBehaviour {
         return null;
     }
 
-    public static bool[,,] GetModelDataFromTrile(Trile trile) {
-
+    public static void SetMeshCollider(Trile trile) {
         Mesh trileMesh = FezToUnity.TrileToMesh(trile);
 
+        importerCollider.gameObject.SetActive(true);
+        importerCollider.sharedMesh=null;
         importerCollider.sharedMesh=trileMesh;
+    }
+
+    public static bool[,,] GetModelDataFromTrile(Trile trile) {
 
         int size = 16;
 
@@ -56,11 +61,12 @@ public class TrixelModelImporter : MonoBehaviour {
 
                     }
                     foreach (Vector3 d in dirs) {
-                        Vector3 pos = ((new Vector3(x,y,z)-Vector3.one/2)/size)-Vector3.one/2;
+                        Vector3 pos = (((new Vector3(x,y,z)-Vector3.one/2)/size)-Vector3.one/2) + importerCollider.transform.position;
 
                         RaycastHit rh;
 
                         if (Physics.Raycast(new Ray(pos,d),out rh, 1f/size)) {
+                            rh.point-=importerCollider.transform.position;
                             IntPos hitPos = IntPos.Vector3ToIntPos((rh.point*16)-rh.normal/2)+(size/2);
                             try {
                                 states[hitPos.x, hitPos.y, hitPos.z]=TrixelState.isCollider;
